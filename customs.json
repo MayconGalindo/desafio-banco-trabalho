@@ -1,0 +1,12 @@
+{
+    "elements": {
+        "wicket:container": {
+            "attributes": {
+                "wicket:id": {}
+            }
+        }
+    },
+    "attributes": {
+        "wicket:id": {}
+    }
+}
