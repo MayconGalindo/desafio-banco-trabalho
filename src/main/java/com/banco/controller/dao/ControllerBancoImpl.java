@@ -198,9 +198,9 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
     /**
      *
-     * @param valor 
+     * @param valor
      * @param pessoa
-     * @param acao
+     * @param acao false: transfere para corrente
      * @param conta
      * @return
      */
@@ -210,7 +210,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
             double saldo;
 
-            if (acao) {
+            if (!acao) {
                 saldo = pessoa.getContaL().get(conta).getValorPoupanca() - valor;
                 if (saldo >= 0 && valor > 0) {
                     pessoa.getContaL().get(conta).setValorPoupanca(saldo);
@@ -253,8 +253,9 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
      * @param pessoa
      * @param acao
      * @param conta
+     * @return
      */
-    public void depositar(double valor, Pessoa pessoa, boolean acao, int conta) {
+    public String depositar(double valor, Pessoa pessoa, boolean acao, int conta) {
 
         try {
 
@@ -270,9 +271,11 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             session.beginTransaction();
             session.update(pessoa);
             session.getTransaction().commit();
+            return "Deposito realizado";
 
         } catch (HibernateException e) {
             System.out.println(e);
+            return e.toString();
         } finally {
             closeSession();
         }

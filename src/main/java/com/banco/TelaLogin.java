@@ -46,7 +46,7 @@ public final class TelaLogin extends WebPage {
         super();
 
         pessoa = new Pessoa();
-        WebMarkupContainer markup = new WebMarkupContainer("markupBody");
+        WebMarkupContainer markup = new WebMarkupContainer("bodyMarkup");
         FeedbackPanel feedbackPanel = new FeedbackPanel("feedback");
         Form form = new Form("form", new CompoundPropertyModel<>(pessoa));
 
@@ -70,7 +70,7 @@ public final class TelaLogin extends WebPage {
                     switch (pessoa.getTipoConta()) {
 
                         case 'A':
-                            page = new InicioAdm(pessoa);
+                            page = new InicioAdm();
                             break;
 
                         case 'U':

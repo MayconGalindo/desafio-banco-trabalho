@@ -22,7 +22,7 @@ import java.util.List;
  * @author NOTEDESENVSP1
  * @param <T>
  */
-public interface ControllerDAO<T> {
+public interface ControllerDAO<T>{
 
     public void adicionarOuEditar(T cl);
 

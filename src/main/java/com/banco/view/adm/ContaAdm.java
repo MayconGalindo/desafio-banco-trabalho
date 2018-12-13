@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.banco.controller;
+package com.banco.view.adm;
 
-import com.banco.controller.dao.ControllerPessoaImpl;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.markup.html.WebPage;
 
 /**
  *
  * @author NOTEDESENVSP1
  */
-public class ControllerPessoa extends ControllerPessoaImpl{
+public final class ContaAdm extends WebPage {
 
+    public ContaAdm() {
+        super();
+    }
+    
+    public ContaAdm(PageParameters params) {
+        //TODO:  process page parameters
+    }
 }

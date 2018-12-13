@@ -4,10 +4,44 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>ListarConta</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
     </head>
     <body>
         <wicket:panel>
-            lista
+            <div wicket:id="bodyMarkup">
+                <table class="table table-dark">
+                    <wicket:child />
+                    <thead>
+                        <tr>
+                            <th>Agencia</th>
+                            <th>Conta</th>
+                            <th>Corrente</th>
+                            <th>Poupança</th>
+                            <th><span wicket:id="label"/></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr wicket:id="list">
+                            <td>
+                                <label wicket:id="agencia"></label>
+                            </td>
+                            <td>
+                                <label wicket:id="conta"></label>
+                            </td>
+                            <td>
+                                <label wicket:id="corrente"></label>
+                            </td>
+                            <td>
+                                <label wicket:id="poupanca"></label>
+                            </td>
+                            <td>
+                                <span wicket:id="selecionar"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <span wicket:id="pag" class="pagination"></span>
+            </div>
         </wicket:panel>
     </body>
 </html>

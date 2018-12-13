@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:wicket>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>Header</title>
+    </head>
+    <body>
+        <wicket:panel>
+            <nav wicket:id="bodyMarkup" class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a wicket:id="inicio" class="nav-link">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a wicket:id="contas" class="nav-link">Minhas Contas</a>
+                            <span wicket:id="lista"></span>
+                        </li>
+                        <li class="nav-item">
+                            <a wicket:id="sair" class="nav-link">Sair</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </wicket:panel>
+    </body>
+</html>

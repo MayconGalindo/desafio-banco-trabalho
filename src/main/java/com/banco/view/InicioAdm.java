@@ -15,12 +15,21 @@
  */
 package com.banco.view;
 
+import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
+import com.banco.view.adm.Funcoes;
+import com.banco.view.adm.custom.AdmHeader;
+import java.util.List;
+import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.PageableListView;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 
 /**
  *
@@ -28,23 +37,57 @@ import org.apache.wicket.model.Model;
  */
 public final class InicioAdm extends WebPage {
 
-    WebMarkupContainer markup;
-    Label lbl; 
-    
-    public InicioAdm(Pessoa pessoa) {
-        
+    WebMarkupContainer markBody;
+    PageableListView listView;
+    List<Pessoa> refreshLista = new ControllerPessoa().listar();
+
+    public InicioAdm() {
+
         super();
-        
-        markup = new WebMarkupContainer("markup");
-        lbl =  new Label("lbl", Model.of(pessoa.getNome()));
-        
-        markup.add(lbl);
-        
-        add(markup);
-        
+
+        markBody = new WebMarkupContainer("bodyMarkup");
+
+        markBody.add(new AdmHeader("header", true));
+
+        IModel lista = new LoadableDetachableModel() {
+
+            @Override
+            protected Object load() {
+                return refreshLista;
+            }
+
+        };
+
+        listView = new PageableListView<Pessoa>("list", lista, 30) {
+
+            @Override
+            protected void populateItem(ListItem<Pessoa> item) {
+
+                Pessoa pessoa = item.getModelObject();
+
+                item.add(new Label("id", pessoa.getId()));
+                item.add(new Label("nome", pessoa.getNome()));
+                item.add(new Label("cpf", pessoa.getCpf()));
+                item.add(new Label("cep", pessoa.getCep()));
+                item.add(new Label("endereco", pessoa.getEndereco() + ", " + pessoa.getNumero()));
+                item.add(new Label("email", pessoa.getEmail()));
+                item.add(new Label("tipoConta", pessoa.getTipoConta()));
+                item.add(new Funcoes("funcoes", pessoa.getId()));
+
+            }
+
+        };
+        listView.setOutputMarkupPlaceholderTag(true);
+        listView.setOutputMarkupId(true);
+
+        markBody.add(listView);
+        markBody.add(new AjaxPagingNavigator("pag", listView));
+
+        add(markBody);
+
     }
-    
+
     public InicioAdm(PageParameters params) {
-        
+
     }
 }

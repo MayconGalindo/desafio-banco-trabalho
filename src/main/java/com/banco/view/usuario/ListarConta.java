@@ -15,7 +15,18 @@
  */
 package com.banco.view.usuario;
 
+import com.banco.model.BancoBrasil;
+import com.banco.model.Pessoa;
+import com.banco.view.usuario.custom.LinkSelecionar;
+import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.PageableListView;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
 
 /**
  *
@@ -23,9 +34,59 @@ import org.apache.wicket.markup.html.panel.Panel;
  */
 public final class ListarConta extends Panel {
 
-    public ListarConta(String id) {
-        
+    WebMarkupContainer markup;
+    PageableListView lv;
+    LinkSelecionar selecionar;
+    Label lblSelecionar;
+    
+    public ListarConta(String id, Pessoa pessoa, String func, boolean cp, boolean inicio) {
+
         super(id);
+
+        markup = new WebMarkupContainer("bodyMarkup");
         
+        lblSelecionar = new Label("label", Model.of("Escolher"));
+        markup.add(lblSelecionar);
+        
+        IModel lista = new LoadableDetachableModel() {
+
+            @Override
+            protected Object load() {
+                return pessoa.getContaL();
+            }
+
+        };
+
+        lv = new PageableListView<BancoBrasil>("list", lista, 6) {
+
+            @Override
+            protected void populateItem(ListItem<BancoBrasil> item) {
+
+                BancoBrasil conta = item.getModelObject();
+
+                selecionar = new LinkSelecionar("selecionar", pessoa, func, cp, conta.getId());
+
+                if (inicio == true) {
+                    selecionar.setVisible(false);
+                    lblSelecionar.setVisibilityAllowed(false);
+                }
+
+                item.add(new Label("agencia", conta.getAgencia()));
+                item.add(new Label("conta", conta.getConta()));
+                item.add(new Label("corrente", conta.getValorCorrente()));
+                item.add(new Label("poupanca", conta.getValorPoupanca()));
+                item.add(selecionar);
+
+            }
+
+        };
+        lv.setOutputMarkupPlaceholderTag(true);
+        lv.setOutputMarkupId(true);
+
+        markup.add(lv);
+        markup.add(new AjaxPagingNavigator("pag", lv));
+
+        add(markup);
+
     }
 }

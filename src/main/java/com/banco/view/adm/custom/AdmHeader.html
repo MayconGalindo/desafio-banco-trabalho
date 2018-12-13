@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:wicket>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>AdmHeader</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <wicket:panel>
+        <nav wicket:id="bodyMarkup" class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a wicket:id="usuario" href="#">Usuarios</a></li>
+                        <li><a wicket:id="conta" href="#">Contas</a></li>
+                        <li><a wicket:id="sair" href="#">Sair</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><button wicket:id="btnAdd" class="btn btn-primary my-2 my-sm-0" type="submit">Adicionar</button></li>
+                        <span wicket:id="formAdd" />
+                        <li>
+                            <form wicket:id="searchForm" class="form-inline my-2 my-lg-0">
+                                <input wicket:id="txtSearch" class="form-control mr-sm-2" type="text" placeholder="Procurar"
+                                    aria-label="Search">
+                                <button wicket:id="btnSearch" class="btn btn-success my-2 my-sm-0" type="submit">Procurar</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </wicket:panel>
+</body>
+
+</html>

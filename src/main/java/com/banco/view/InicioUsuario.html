@@ -3,17 +3,20 @@
 <html xmlns:wicket="http://wicket.apache.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <title>InicioCliente</title>
-        <link rel="stylesheet" type="text/css" href="style.css"/>
+        <title>Inicio Usuario</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
+        <link href="../../../../resources/css/Usuario.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
-        <div wicket:id="markupBody">
-            <span wicket:id="btnTra">Transferir</span>
-            <span wicket:id="pnlTra"/>
-            <span wicket:id="btnDep">Depositar</span>
-            <span wicket:id="pnlDep"/>
-            <span wicket:id="btnSqr">Saquar</span>
-            <span wicket:id="pnlSqr"/>
+        <div wicket:id="bodyMarkup">
+            <span wicket:id="header"/>
+            <div class="row">
+                <div class="col"><button wicket:id="btnTraM" type="button" class="btn btn-primary">Transferir para a mesma conta</button></div>
+                <div class="col"><button wicket:id="btnDep" type="button" class="btn btn-primary">Depositar</button></div>
+                <div class="w-100"></div>
+                <div class="col"><button wicket:id="btnTraD" type="button" class="btn btn-primary">Transferir para contas diferentes</button></div>
+                <div class="col"><button wicket:id="btnSqr" type="button" class="btn btn-primary">Saquar</button></div>
+            </div>
         </div>
     </body>
 </html>

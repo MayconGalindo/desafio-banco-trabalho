@@ -13,83 +13,72 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.banco.view;
+package com.banco.view.usuario.custom;
 
-import com.banco.model.BancoBrasil;
+import com.banco.TelaLogin;
 import com.banco.model.Pessoa;
-import com.banco.view.usuario.Funcao;
-import com.banco.view.usuario.custom.HeaderUsuario;
+import com.banco.view.InicioUsuario;
+import com.banco.view.usuario.ListarConta;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.component.IRequestablePage;
+import org.apache.wicket.Session;
 
 /**
  *
  * @author NOTEDESENVSP1
  */
-public final class InicioUsuario extends WebPage {
+public final class HeaderUsuario extends Panel {
 
-    Pessoa pessoa;
-    BancoBrasil banco;
-    WebMarkupContainer markBody;
+    ModalWindow lista;
+    WebMarkupContainer bodyMarkup;
     IRequestablePage page;
 
-    public InicioUsuario(Pessoa pessoa) {
+    public HeaderUsuario(String id, Pessoa pessoa) {
 
-        super();
+        super(id);
 
-        markBody = new WebMarkupContainer("bodyMarkup");
+        bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
-        markBody.add(new HeaderUsuario("header", pessoa));
-
-        markBody.add(new AjaxLink("btnTraM") {
+        bodyMarkup.add(new AjaxLink("inicio") {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Mes");
+                page = new InicioUsuario(pessoa);
                 setResponsePage(page);
             }
 
         });
 
-        markBody.add(new AjaxLink("btnTraD") {
+        lista = new ModalWindow("lista");
+        lista.setTitle("Minhas Contas");
+        lista.setContent(new ListarConta(lista.getContentId(), pessoa, null, true, true));
+        bodyMarkup.add(lista);
+
+        bodyMarkup.add(new AjaxLink("contas") {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Dif");
+                lista.show(target);
+            }
+
+        });
+        
+        bodyMarkup.add(new AjaxLink("sair") {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                page = new TelaLogin();
                 setResponsePage(page);
+                Session.get().invalidateNow();
             }
 
         });
 
-        markBody.add(new AjaxLink("btnDep") {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Dep");
-                setResponsePage(page);
-            }
-
-        });
-
-        markBody.add(new AjaxLink("btnSqr") {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Saq");
-                setResponsePage(page);
-            }
-
-        });
-
-        add(markBody);
-
-    }
-
-    public InicioUsuario(PageParameters params) {
+        add(bodyMarkup);
 
     }
 }

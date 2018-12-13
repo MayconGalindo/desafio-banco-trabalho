@@ -3,13 +3,41 @@
 <html xmlns:wicket="http://wicket.apache.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <title>InicioAdm</title>
-        <link rel="stylesheet" type="text/css" href="style.css"/>
+        <title>Inicio Adm</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="../../../../resources/js/AddEditPessoa.js" type="text/javascript"></script>
     </head>
     <body>
-        <!--        <span wicket:id='mainNavigation'/> -->
-        <div wicket:id="markup">
-        ADM <span wicket:id="lbl"/>
+        <div wicket:id="bodyMarkup">
+            <span wicket:id="header"/>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">CPF</th>
+                        <th scope="col">Cep</th>
+                        <th scope="col">Endereço</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Funções</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr wicket:id="list">
+                        <th wicket:id="id" scope="row"></th>
+                        <td wicket:id="nome"></td>
+                        <td wicket:id="cpf"></td>
+                        <td wicket:id="cep"></td>
+                        <td wicket:id="endereco"></td>
+                        <td wicket:id="email"></td>
+                        <td wicket:id="tipoConta"></td>
+                        <td wicket:id="funcoes"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <span wicket:id="pag" class="pagination"></span>
         </div>
     </body>
 </html>
