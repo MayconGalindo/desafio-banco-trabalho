@@ -34,7 +34,7 @@ import org.apache.wicket.util.resource.AbstractResourceStreamWriter;
  *
  * @author NOTEDESENVSP1
  */
-public final class Funcoes extends Panel {
+public class Funcoes extends Panel {
 
     ModalWindow modalDel;
     ModalWindow modalEdit;
@@ -42,7 +42,7 @@ public final class Funcoes extends Panel {
     AjaxLink linkEdit;
     WebMarkupContainer bodyMarkup;
 
-    public Funcoes(String id, Integer idPessoa) {
+    public Funcoes(String id, Integer idPessoa, boolean pessoaOuBanco) {
 
         super(id);
 
@@ -53,7 +53,15 @@ public final class Funcoes extends Panel {
         modalDel.setOutputMarkupId(true);
         modalDel.setResizable(false);
         modalDel.setTitle("Excluir");
-        modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa));
+        modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco) {
+
+            @Override
+            public void fecharModal(AjaxRequestTarget target) {
+                modalDel.close(target);
+                atualizarLista(target);
+            }
+
+        });
         bodyMarkup.add(modalDel);
         bodyMarkup.add(linkDel = new AjaxLink("linkDel") {
 
@@ -69,7 +77,15 @@ public final class Funcoes extends Panel {
         modalEdit.setOutputMarkupId(true);
         modalEdit.setResizable(false);
         modalEdit.setTitle("Editar");
-        modalEdit.setContent(new AddEditPessoa(modalEdit.getContentId(), idPessoa));
+        modalEdit.setContent(new AddEditPessoa(modalEdit.getContentId(), idPessoa) {
+
+            @Override
+            public void fecharModal(AjaxRequestTarget target) {
+                modalEdit.close(target);
+                atualizarLista(target);
+            }
+
+        });
         bodyMarkup.add(modalEdit);
         bodyMarkup.add(linkEdit = new AjaxLink("linkEdit") {
 
@@ -85,7 +101,7 @@ public final class Funcoes extends Panel {
 
             @Override
             public void onClick() {
-                gerarRelatorio(idPessoa, true);
+                gerarRelatorio(idPessoa, true, pessoaOuBanco);
             }
 
         });
@@ -94,7 +110,7 @@ public final class Funcoes extends Panel {
 
             @Override
             public void onClick() {
-                gerarRelatorio(idPessoa, false);
+                gerarRelatorio(idPessoa, false, pessoaOuBanco);
             }
 
         });
@@ -103,17 +119,27 @@ public final class Funcoes extends Panel {
 
     }
 
-    public void gerarRelatorio(Integer id, boolean excelOuPdf) {
+    void gerarRelatorio(Integer id, boolean excelOuPdf, boolean pessoaOuBanco) {
 
         byte[] bit;
         String arq;
-        
+
         if (excelOuPdf) {
-            bit = new Relatorio().gerarExcel(id);
-            arq = "Relatorio ID " + id + ".xls";
+            if (pessoaOuBanco) {
+                bit = new Relatorio().gerarExcelPessoa(id);
+                arq = "Relatorio ID " + id + ".xls";
+            } else {
+                bit = new Relatorio().gerarExcelConta(id);
+                arq = "Relatorio Conta " + id + ".xls";
+            }
         } else {
-            bit = new Relatorio().gerarPdf(id);
-            arq = "Relatorio ID " + id + ".pdf";
+            if (pessoaOuBanco) {
+                bit = new Relatorio().gerarPdfPessoa(id);
+                arq = "Relatorio ID " + id + ".pdf";
+            } else {
+                bit = new Relatorio().gerarPdfConta(id);
+                arq = "Relatorio Conta " + id + ".pdf";
+            }
         }
 
         AbstractResourceStreamWriter stream = new AbstractResourceStreamWriter() {
@@ -131,6 +157,9 @@ public final class Funcoes extends Panel {
         hand.setFileName(arq);
         getRequestCycle().scheduleRequestHandlerAfterCurrent(hand);
 
+    }
+
+    public void atualizarLista(AjaxRequestTarget target) {
     }
 
 }

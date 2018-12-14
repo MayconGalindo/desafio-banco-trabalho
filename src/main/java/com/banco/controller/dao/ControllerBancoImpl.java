@@ -54,7 +54,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
             Session session = getSession();
             session.beginTransaction();
-            BancoBrasil pessoa = (BancoBrasil) session.get(Pessoa.class, id);
+            BancoBrasil pessoa = (BancoBrasil) session.get(BancoBrasil.class, id);
             session.delete(pessoa);
             session.getTransaction().commit();
 
@@ -73,7 +73,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
             Session session = getSession();
             session.beginTransaction();
-            List<BancoBrasil> list = session.createCriteria(Pessoa.class).list();
+            List<BancoBrasil> list = session.createCriteria(BancoBrasil.class).list();
             session.getTransaction().commit();
 
             return list;
@@ -115,6 +115,27 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
         }
 
     }
+    
+    public BancoBrasil procurarId(Integer id) {
+        
+        try {
+
+            BancoBrasil banco;
+            Session ses = getSession();
+            ses.beginTransaction();
+            banco = (BancoBrasil) ses.createCriteria(BancoBrasil.class).add(Restrictions.eq("id", id)).uniqueResult();
+            ses.getTransaction().commit();
+
+            return banco;
+
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
+        } finally {
+            closeSession();
+        }
+        
+    }
 
     @Override
     public List<BancoBrasil> filtrar(String cidades) {
@@ -124,7 +145,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             List<BancoBrasil> list;
             Session ses = getSession();
             ses.beginTransaction();
-            list = ses.createCriteria(Pessoa.class).add(Restrictions.eq("cidade", cidades)).list();
+            list = ses.createCriteria(BancoBrasil.class).add(Restrictions.eq("cidade", cidades)).list();
             ses.getTransaction().commit();
 
             return list;

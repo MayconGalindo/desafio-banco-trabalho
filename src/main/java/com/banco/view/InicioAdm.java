@@ -20,8 +20,8 @@ import com.banco.model.Pessoa;
 import com.banco.view.adm.Funcoes;
 import com.banco.view.adm.custom.AdmHeader;
 import java.util.List;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
@@ -37,7 +37,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
  */
 public final class InicioAdm extends WebPage {
 
-    WebMarkupContainer markBody;
+    WebMarkupContainer bodyMarkup;
     PageableListView listView;
     List<Pessoa> refreshLista = new ControllerPessoa().listar();
 
@@ -45,9 +45,18 @@ public final class InicioAdm extends WebPage {
 
         super();
 
-        markBody = new WebMarkupContainer("bodyMarkup");
+        bodyMarkup = new WebMarkupContainer("bodyMarkup");
+        bodyMarkup.setOutputMarkupId(true);
 
-        markBody.add(new AdmHeader("header", true));
+        bodyMarkup.add(new AdmHeader("header", true) {
+
+            @Override
+            public void atualizarLista(AjaxRequestTarget target) {
+                refreshLista = new ControllerPessoa().listar();
+                target.add(bodyMarkup);
+            }
+
+        });
 
         IModel lista = new LoadableDetachableModel() {
 
@@ -72,7 +81,16 @@ public final class InicioAdm extends WebPage {
                 item.add(new Label("endereco", pessoa.getEndereco() + ", " + pessoa.getNumero()));
                 item.add(new Label("email", pessoa.getEmail()));
                 item.add(new Label("tipoConta", pessoa.getTipoConta()));
-                item.add(new Funcoes("funcoes", pessoa.getId()));
+                item.add(new Label("contas", pessoa.getContaL().size()));
+                item.add(new Funcoes("funcoes", pessoa.getId(), true) {
+
+                    @Override
+                    public void atualizarLista(AjaxRequestTarget target) {
+                        refreshLista = new ControllerPessoa().listar();
+                        target.add(bodyMarkup);
+                    }
+
+                });
 
             }
 
@@ -80,14 +98,13 @@ public final class InicioAdm extends WebPage {
         listView.setOutputMarkupPlaceholderTag(true);
         listView.setOutputMarkupId(true);
 
-        markBody.add(listView);
-        markBody.add(new AjaxPagingNavigator("pag", listView));
+        bodyMarkup.add(listView);
+        bodyMarkup.add(new AjaxPagingNavigator("pag", listView));
 
-        add(markBody);
+        add(bodyMarkup);
 
     }
 
     public InicioAdm(PageParameters params) {
-
     }
 }

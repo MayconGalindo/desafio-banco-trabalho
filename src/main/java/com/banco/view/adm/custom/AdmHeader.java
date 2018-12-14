@@ -45,7 +45,7 @@ import org.apache.wicket.request.component.IRequestablePage;
  *
  * @author NOTEDESENVSP1
  */
-public final class AdmHeader extends Panel {
+public class AdmHeader extends Panel {
 
     ModalWindow lista;
     WebMarkupContainer bodyMarkup;
@@ -54,7 +54,7 @@ public final class AdmHeader extends Panel {
     ModalWindow formAdd;
     Pessoa pessoa;
     BancoBrasil banco;
-    Component addEdit;
+    Component add;
     CompoundPropertyModel model;
     PropertyModel txtSearch;
     String titulo;
@@ -72,16 +72,24 @@ public final class AdmHeader extends Panel {
 
         if (pagina) {
             titulo = "Adicionar Pessoa";
-            addEdit = new AddEditPessoa(formAdd.getContentId(), null);
+            add = new AddEditPessoa(formAdd.getContentId(), null){
+
+                @Override
+                public void fecharModal(AjaxRequestTarget target) {
+                    formAdd.close(target);
+                    atualizarLista(target);
+                }
+
+            };
             txtSearch = new PropertyModel<>(pessoa, "cpf");
         } else {
             titulo = "Adicionar Conta";
-            addEdit = new AddEditConta(formAdd.getContentId());
+            add = new AddEditConta(formAdd.getContentId());
             txtSearch = new PropertyModel<>(banco, "conta");
         }
 
         formAdd.setTitle(titulo);
-        formAdd.setContent(addEdit);
+        formAdd.setContent(add);
         bodyMarkup.add(formAdd);
 
         bodyMarkup.add(new AjaxLink("btnAdd") {
@@ -89,6 +97,7 @@ public final class AdmHeader extends Panel {
             @Override
             public void onClick(AjaxRequestTarget target) {
                 formAdd.show(target);
+                atualizarLista(target);
             }
 
         });
@@ -151,4 +160,8 @@ public final class AdmHeader extends Panel {
         add(bodyMarkup);
 
     }
+
+    public void atualizarLista(AjaxRequestTarget target){
+    }
+    
 }

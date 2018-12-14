@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.banco.controller;
-
-import com.banco.controller.dao.ControllerPessoaImpl;
-import com.banco.model.Pessoa;
-import java.util.List;
+package com.banco.controller.relatorio;
 
 /**
  *
  * @author NOTEDESENVSP1
  */
-public class ControllerPessoa extends ControllerPessoaImpl{
-
-    @Override
-    public List<Pessoa> procurar(Integer conta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+public class Teste {
+    
+    public static void main(String[] args) {
+        
+        new Relatorio().gerarExcelConta(1);
+        new Relatorio().gerarPdfConta(1);
+        
     }
-
+    
 }

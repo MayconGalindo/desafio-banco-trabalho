@@ -114,6 +114,27 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         }
 
     }
+    
+    public Pessoa procurarId(Integer id) {
+        
+        try {
+
+            Pessoa pessoa;
+            Session ses = getSession();
+            ses.beginTransaction();
+            pessoa = (Pessoa) ses.createCriteria(Pessoa.class).add(Restrictions.eq("id", id)).uniqueResult();
+            ses.getTransaction().commit();
+
+            return pessoa;
+
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
+        } finally {
+            closeSession();
+        }
+        
+    }
 
     @Override
     public List<Pessoa> filtrar(String filtros) {
@@ -137,28 +158,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
     }
     
-    @Override
-    public List<Pessoa> procurar(Integer id) {
-        
-        try {
-
-            List<Pessoa> list;
-            Session ses = getSession();
-            ses.beginTransaction();
-            list = ses.createCriteria(Pessoa.class).add(Restrictions.eq("id", id)).list();
-            ses.getTransaction().commit();
-
-            return list;
-
-        } catch (HibernateException e) {
-            System.out.println(e);
-            return null;
-        } finally {
-            closeSession();
-        }
-        
-    }
-
     public boolean validarLogin(String cpf, String senha) {
 
         try {
