@@ -3,15 +3,29 @@
 <html xmlns:wicket>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <title>AddEditConta</title>
+        <title>AddEditUser</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     </head>
     <body>
         <wicket:panel>
-            <!-- TODO - add components here, ala
-            
-            <span wicket:id="title">title here</span>
-            
-            -->
+            <div wicket:id="bodyMarkup">
+                <form wicket:id="form" class="form-inline">
+                    <div class="form-group">
+                        <label for="validationDefault03">Pessoa</label>
+                        <select wicket:id="cpf" type="text" class="form-control" id="validationDefault03" placeholder="Tipo de Conta" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="validationDefault03">Agencia</label>
+                        <input wicket:id="agencia" type="text" class="form-control" id="validationDefault03" placeholder="Agencia" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="validationDefault04">Conta</label>
+                        <input wicket:id="conta" type="text" class="form-control" id="validationDefault04" placeholder="Conta" required/>
+                    </div>
+                    <button wicket:id="submit" class="btn btn-primary" type="submit">Adicionar</button>
+                </form>
+            </div>
         </wicket:panel>
     </body>
 </html>

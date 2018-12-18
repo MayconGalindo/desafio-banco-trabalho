@@ -24,6 +24,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  *
@@ -36,10 +38,18 @@ public class Pessoa extends PessoaDAOImpl implements Serializable {
     @OneToMany(mappedBy = "pessoa",
             orphanRemoval = true,
             targetEntity = BancoBrasil.class,
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     private List<BancoBrasil> contaL = new ArrayList<BancoBrasil>();
-
+    
+    @OneToMany(mappedBy = "pessoa",
+            orphanRemoval = true,
+            targetEntity = Contato.class,
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Contato> contatoL = new ArrayList<Contato>();
+    
     public Pessoa() {
         super();
     }
@@ -54,8 +64,8 @@ public class Pessoa extends PessoaDAOImpl implements Serializable {
 
     @Override
     public String toString() {
-        return "\n ID: " + getId() + " Tipo: " + getTipoConta() + " Nome: " + getNome() + " Senha: " + getSenha() + " Cpf: " + getCpf() +  " Cep: " + getCep() + " email: " + getEmail() + " tel: " + getTelefone() + 
-               "\n Conta: " + getContaL();
+        return "\n ID: " + getId() + " Tipo: " + getTipoConta() + " Nome: " + getNome() + " Senha: " + getSenha() + 
+                " Cpf: " + getCpf() +  " Cep: " + getCep() + " email: " + getEmail() + " tel: " + getTelefone();             
     }
     
     /**
@@ -71,5 +81,19 @@ public class Pessoa extends PessoaDAOImpl implements Serializable {
     public void setContaL(List<BancoBrasil> contaL) {
         this.contaL = contaL;
     }
-    
+
+    /**
+     * @return the contatoL
+     */
+    public List<Contato> getContatoL() {
+        return contatoL;
+    }
+
+    /**
+     * @param contatoL the contatoL to set
+     */
+    public void setContatoL(List<Contato> contatoL) {
+        this.contatoL = contatoL;
+    }
+
 }

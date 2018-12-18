@@ -15,6 +15,8 @@
  */
 package com.banco;
 
+import java.text.ParseException;
+
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
 import com.banco.view.InicioAdm;
@@ -69,8 +71,13 @@ public final class TelaLogin extends WebPage {
 
                     switch (pessoa.getTipoConta()) {
 
-                        case 'A':
+                    case 'A':
+                        try {
                             page = new InicioAdm();
+                        } catch (ParseException e) {
+                            // TODO Auto-generated catch block
+							e.printStackTrace();
+						}
                             break;
 
                         case 'U':

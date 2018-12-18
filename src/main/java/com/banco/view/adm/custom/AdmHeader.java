@@ -25,6 +25,7 @@ import com.banco.view.InicioUsuario;
 import com.banco.view.adm.ContaAdm;
 import com.banco.view.adm.form.AddEditConta;
 import com.banco.view.adm.form.AddEditPessoa;
+import com.banco.view.filtro.InicioTransferencia;
 import com.banco.view.usuario.ListarConta;
 
 import org.apache.wicket.Component;
@@ -40,6 +41,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.component.IRequestablePage;
+
+import java.text.ParseException;
+import java.util.List;
 
 /**
  *
@@ -58,8 +62,9 @@ public class AdmHeader extends Panel {
     CompoundPropertyModel model;
     PropertyModel txtSearch;
     String titulo;
+    List searchList;
 
-    public AdmHeader(String id, boolean pagina) {
+    public AdmHeader(String id, boolean pagina) throws ParseException {
 
         super(id);
 
@@ -72,7 +77,7 @@ public class AdmHeader extends Panel {
 
         if (pagina) {
             titulo = "Adicionar Pessoa";
-            add = new AddEditPessoa(formAdd.getContentId(), null){
+            add = new AddEditPessoa(formAdd.getContentId(), null) {
 
                 @Override
                 public void fecharModal(AjaxRequestTarget target) {
@@ -111,10 +116,12 @@ public class AdmHeader extends Panel {
             protected void onSubmit(AjaxRequestTarget target) {
 
                 if (pagina) {
-                    new ControllerPessoa().procurar(pessoa.getCpf());
+                    searchList = new ControllerPessoa().procurar(pessoa.getCpf());
                 } else {
-                    new ControllerBanco().procurar(banco.getConta());
+                    searchList = new ControllerBanco().procurar(banco.getConta());
                 }
+
+                procurarLista(target, searchList);
 
             }
 
@@ -128,9 +135,14 @@ public class AdmHeader extends Panel {
 
         bodyMarkup.add(new AjaxLink("usuario") {
 
-            @Override
+            @Override 
             public void onClick(AjaxRequestTarget target) {
-                page = new InicioAdm();
+                try {
+                    page = new InicioAdm();
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 setResponsePage(page);
             }
 
@@ -140,7 +152,26 @@ public class AdmHeader extends Panel {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new ContaAdm();
+                try {
+                    page = new ContaAdm();
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                setResponsePage(page);
+            }
+
+        });
+
+        bodyMarkup.add(new AjaxLink("transf") {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                try {
+                    page = new InicioTransferencia();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 setResponsePage(page);
             }
 
@@ -161,7 +192,10 @@ public class AdmHeader extends Panel {
 
     }
 
-    public void atualizarLista(AjaxRequestTarget target){
+    public void atualizarLista(AjaxRequestTarget target) {
     }
-    
+
+    public void procurarLista(AjaxRequestTarget target, List list) {
+    }
+
 }

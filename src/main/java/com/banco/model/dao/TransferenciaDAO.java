@@ -19,30 +19,30 @@ package com.banco.model.dao;
  *
  * @author NOTEDESENVSP1
  */
-interface ContaDAO {
-
+public interface TransferenciaDAO {
+    
     public Integer getId();
 
     public void setId(Integer id);
+    
+    public String getCpfRemetente();
 
-    public Integer getAgencia();
+    public void setCpfRemetente(String cpfRemetente);
 
-    public void setAgencia(Integer agencia);
+    public String getTipoTranferencia();
 
-    public Integer getConta();
+    public void setTipoTranferencia(String tipoTranferencia);
+    
+    public Double getValor();
 
-    public void setConta(Integer conta);
+    public void setValor(Double valor);
+    
+    public String getCpfDestinatario();
 
-    public double getValorPoupanca();
-
-    public void setValorPoupanca(double poupanca);
-
-    public double getValorCorrente();
-
-    public void setValorCorrente(double corrente);
-
-    public boolean isEstadoConta();
-
-    public void setEstadoConta(boolean estadoConta);
-
+    public void setCpfDestinatario(String cpfDestinatario);
+    
+    public String getDataTransf();
+    
+    public void setDataTransf(String dataTransf);
+    
 }

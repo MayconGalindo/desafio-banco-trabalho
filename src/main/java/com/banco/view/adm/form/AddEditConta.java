@@ -15,7 +15,27 @@
  */
 package com.banco.view.adm.form;
 
+import com.banco.controller.ControllerBanco;
+import com.banco.controller.ControllerPessoa;
+import com.banco.model.BancoBrasil;
+import com.banco.model.Pessoa;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.EmailTextField;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.validator.StringValidator;
 
 /**
  *
@@ -23,7 +43,68 @@ import org.apache.wicket.markup.html.panel.Panel;
  */
 public final class AddEditConta extends Panel {
 
+    WebMarkupContainer bodyMarkup;
+    Form form;
+    TextField cpf;
+    TextField cep;
+    TextField uf;
+    PasswordTextField senha;
+    Label btnLabel;
+    AjaxButton submit;
+
+    ControllerBanco cb;
+    Pessoa pessoa;
+    BancoBrasil banco;
+
     public AddEditConta(String id) {
+
         super(id);
+
+        cb = new ControllerBanco();
+
+        pessoa = new Pessoa();
+        banco = new BancoBrasil();
+        btnLabel = new Label("btnLabel", Model.of("Adicionar"));
+
+        bodyMarkup = new WebMarkupContainer("bodyMarkup");
+
+        form = new Form("form", new CompoundPropertyModel<>(banco));
+
+        submit = new AjaxButton("submit", form) {
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target) {
+                pessoa = new ControllerPessoa().procurar(pessoa.getCpf()).get(0);
+                banco.setEstadoConta(true);
+                banco.setPessoa(pessoa);
+                pessoa.getContaL().add(banco);
+                new ControllerPessoa().adicionarOuEditar(pessoa);
+                fecharModal(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target) {
+                super.onError(target); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        };
+
+        form.add(new DropDownChoice("cpf", new PropertyModel<Pessoa>(pessoa, "cpf"), new LoadableDetachableModel<List<String>>() {
+            @Override
+            protected List<String> load() {
+                return new ControllerPessoa().listarCpf();
+            }
+        }));
+        form.add(new TextField("agencia"));
+        form.add(new TextField("conta"));
+        form.add(submit);
+
+        bodyMarkup.add(form);
+        add(bodyMarkup);
+
     }
+
+    public void fecharModal(AjaxRequestTarget target) {
+    }
+
 }

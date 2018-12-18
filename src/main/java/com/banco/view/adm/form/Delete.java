@@ -19,6 +19,7 @@ import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -30,38 +31,47 @@ import org.apache.wicket.model.Model;
  * @author NOTEDESENVSP1
  */
 public class Delete extends Panel {
-    
+
     WebMarkupContainer bodyMarkup;
-    String label;
-    
+    AjaxLink link;
+    String label, lblLink;
+
     public Delete(String id, int idAlvo, boolean pessoaOuBanco) {
-        
+
         super(id);
-    
-        bodyMarkup = new WebMarkupContainer("bodyMarkup");
-        
+
         if (pessoaOuBanco) {
             label = "Deseja excluir o Id: " + idAlvo;
+            lblLink = "Excluir";
         } else {
             label = "Deseja desativar a conta: " + idAlvo;
+            lblLink = "Desativar";
         }
         
-        bodyMarkup.add(new Label("btnLabel", Model.of(label)));
-        bodyMarkup.add(new AjaxButton("excluir") {
+        bodyMarkup = new WebMarkupContainer("bodyMarkup");
         
+        link = new AjaxLink("excluir") {
+
             @Override
-            protected void onSubmit(AjaxRequestTarget target) {
-                if (pessoaOuBanco) new ControllerPessoa().excluir(idAlvo);
-                else new ControllerBanco().excluir(idAlvo);
-                
+            public void onClick(AjaxRequestTarget target) {
+                if (pessoaOuBanco) {
+                    new ControllerPessoa().excluir(idAlvo);
+                } else {
+                    new ControllerBanco().ativarOuDesativar(idAlvo);
+                }
+
                 fecharModal(target);
             }
-        
-        });
+
+        };
+        link.add(new Label("label", Model.of(lblLink)));
+
+        bodyMarkup.add(new Label("funcLabel", Model.of(label)));
+        bodyMarkup.add(link);
         add(bodyMarkup);
     }
-    
-    public void fecharModal(AjaxRequestTarget target){
+
+    public void fecharModal(AjaxRequestTarget target) {
     }
-     
+
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:wicket>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>FiltroTransferencia</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="../../../../resources/js/AddEditPessoa.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <wicket:panel>
+            <div wicket:id="bodyMarkup">
+                <div class="row">
+                    <form wicket:id="form">
+                        <select wicket:id="cpfRemetente"/>
+                        <select wicket:id="cpfDestinatario"/>
+                        <select wicket:id="tipoTranferencia"/>
+                        <select wicket:id="valor"/>
+                        <button wicket:id="submit" class="btn btn-primary" type="submit">Filtrar</button>
+                    </form>
+                </div>
+            </div>
+        </wicket:panel>
+    </body>
+</html>

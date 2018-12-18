@@ -38,8 +38,6 @@ public class Funcoes extends Panel {
 
     ModalWindow modalDel;
     ModalWindow modalEdit;
-    AjaxLink linkDel;
-    AjaxLink linkEdit;
     WebMarkupContainer bodyMarkup;
 
     public Funcoes(String id, Integer idPessoa, boolean pessoaOuBanco) {
@@ -63,7 +61,7 @@ public class Funcoes extends Panel {
 
         });
         bodyMarkup.add(modalDel);
-        bodyMarkup.add(linkDel = new AjaxLink("linkDel") {
+        bodyMarkup.add(new AjaxLink("linkDel") {
 
             @Override
             public void onClick(AjaxRequestTarget art) {
@@ -71,7 +69,6 @@ public class Funcoes extends Panel {
             }
 
         });
-        linkDel.setOutputMarkupId(true);
 
         modalEdit = new ModalWindow("modalEdit");
         modalEdit.setOutputMarkupId(true);
@@ -87,7 +84,7 @@ public class Funcoes extends Panel {
 
         });
         bodyMarkup.add(modalEdit);
-        bodyMarkup.add(linkEdit = new AjaxLink("linkEdit") {
+        bodyMarkup.add(new AjaxLink("linkEdit") {
 
             @Override
             public void onClick(AjaxRequestTarget art) {
@@ -95,7 +92,6 @@ public class Funcoes extends Panel {
             }
 
         });
-        linkEdit.setOutputMarkupId(true);
 
         bodyMarkup.add(new Link<Void>("excel") {
 

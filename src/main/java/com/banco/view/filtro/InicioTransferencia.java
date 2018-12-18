@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.banco.view;
+package com.banco.view.filtro;
 
-import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
+import com.banco.model.Transferencia;
 import com.banco.view.adm.Funcoes;
 import com.banco.view.adm.custom.AdmHeader;
 import java.text.ParseException;
@@ -37,34 +37,20 @@ import org.apache.wicket.model.LoadableDetachableModel;
  *
  * @author NOTEDESENVSP1
  */
-public final class InicioAdm extends WebPage {
+public final class InicioTransferencia extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
-    List<Pessoa> refreshLista = new ControllerPessoa().listar();
-
-    public InicioAdm() throws ParseException{
-
+    List<Transferencia> refreshLista = new ControllerPessoa().listarTransferencia();
+    
+    public InicioTransferencia() throws ParseException{
+        
         super();
-
+        
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);
 
-        bodyMarkup.add(new AdmHeader("header", true) {
-
-            @Override
-            public void atualizarLista(AjaxRequestTarget target) {
-                refreshLista = new ControllerPessoa().listar();
-                target.add(bodyMarkup);
-            }
-
-            @Override
-            public void procurarLista(AjaxRequestTarget target, List list) {
-                refreshLista = list;
-                target.add(bodyMarkup);
-            }
-            
-        });
+        bodyMarkup.add(new AdmHeader("header", true));
 
         IModel lista = new LoadableDetachableModel() {
 
@@ -75,30 +61,29 @@ public final class InicioAdm extends WebPage {
 
         };
 
-        listView = new PageableListView<Pessoa>("list", lista, 30) {
+        bodyMarkup.add(new FiltroTransferencia("tableHeader"){
+            
+            @Override
+            public void atualizarLista(AjaxRequestTarget target, List<Transferencia> lista) {
+                refreshLista = lista;
+                target.add(bodyMarkup);
+            }
+            
+        });
+        
+        listView = new PageableListView<Transferencia>("list", lista, 30) {
 
             @Override
-            protected void populateItem(ListItem<Pessoa> item) {
+            protected void populateItem(ListItem<Transferencia> item) {
 
-                Pessoa pessoa = item.getModelObject();
+                Transferencia transferencia = item.getModelObject();
 
-                item.add(new Label("id", pessoa.getId()));
-                item.add(new Label("nome", pessoa.getNome()));
-                item.add(new Label("cpf", pessoa.getCpf()));
-                item.add(new Label("cep", pessoa.getCep()));
-                item.add(new Label("endereco", pessoa.getEndereco() + ", " + pessoa.getNumero()));
-                item.add(new Label("email", pessoa.getEmail()));
-                item.add(new Label("tipoConta", pessoa.getTipoConta()));
-                item.add(new Label("contas", new ControllerBanco().contasPessoa(pessoa.getId()).size()));
-                item.add(new Funcoes("funcoes", pessoa.getId(), true) {
-
-                    @Override
-                    public void atualizarLista(AjaxRequestTarget target) {
-                        refreshLista = new ControllerPessoa().listar();
-                        target.add(bodyMarkup);
-                    }
-
-                });
+                item.add(new Label("id", transferencia.getId()));
+                item.add(new Label("cpfR", transferencia.getCpfRemetente()));
+                item.add(new Label("cpfD", transferencia.getCpfDestinatario()));
+                item.add(new Label("tipo", transferencia.getTipoTranferencia()));
+                item.add(new Label("valor", transferencia.getValor()));
+                item.add(new Label("data", transferencia.getDataTransf()));
 
             }
 
@@ -110,9 +95,10 @@ public final class InicioAdm extends WebPage {
         bodyMarkup.add(new AjaxPagingNavigator("pag", listView));
 
         add(bodyMarkup);
-
+        
     }
-
-    public InicioAdm(PageParameters params) {
+    
+    public InicioTransferencia(PageParameters params) {
+        //TODO:  process page parameters
     }
 }

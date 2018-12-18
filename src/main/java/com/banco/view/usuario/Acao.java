@@ -74,7 +74,6 @@ public final class Acao extends Panel {
         valor = new BancoBrasil();
         markup = new WebMarkupContainer("bodyMarkup");
         markup.add(new FeedbackPanel("feedback"));
-        
 
         form = new Form("form", new CompoundPropertyModel<>(valor));
 
@@ -93,13 +92,13 @@ public final class Acao extends Panel {
             agencia.setVisible(false);
             lblConta.setVisible(false);
             contaTransf.setVisible(false);
+            agencia.setRequired(false);
+            contaTransf.setRequired(false);
         }
 
         inp = new NumberTextField("corrente");
         inp.setMinimum(0.1);
-        inp.setRequired(true);
         inp.setOutputMarkupId(true);
-        inp.add(new ValorValidator());
 
         form.add(inp);
         form.add(lblAgencia);
@@ -111,22 +110,24 @@ public final class Acao extends Panel {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
 
+                System.out.println("Teste OK");
+
                 switch (funcao) {
 
-                    case "Mes":
-                        mensagem = cb.transferirMesmaConta(valor.getValorCorrente(), sessao, corOuPop, conta - 1);
+                    case "Dif":
+                        mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta - 2, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
                         break;
 
-                    case "Dif":
-                        mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta - 1, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
+                    case "Mes":
+                        mensagem = cb.transferirMesmaConta(valor.getValorCorrente(), sessao, corOuPop, conta - 2);
                         break;
 
                     case "Dep":
-                        mensagem = cb.depositar(valor.getValorCorrente(), sessao, corOuPop, conta - 1);
+                        mensagem = cb.depositar(valor.getValorCorrente(), sessao, corOuPop, conta - 2);
                         break;
 
                     case "Saq":
-                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, corOuPop, conta - 1);
+                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, corOuPop, conta - 2);
                         break;
 
                 }
@@ -140,7 +141,7 @@ public final class Acao extends Panel {
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                super.onError(target); //To change body of generated methods, choose Tools | Templates.
+                System.out.println("Teste Erro");
             }
 
         });

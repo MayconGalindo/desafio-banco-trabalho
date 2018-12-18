@@ -37,7 +37,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.exolab.castor.xml.validators.IntegerValidator;
 
 /**
  *
@@ -75,16 +74,26 @@ public class AddEditPessoa extends Panel {
 
         cp = new ControllerPessoa();
         senha = new PasswordTextField("senha");
-        if (idPessoa == null) {
+
+        try {
+
+            if (idPessoa == null) {
+                pessoa = new Pessoa();
+                banco = new BancoBrasil();
+                btnLabel = new Label("btnLabel", Model.of("Adicionar"));
+                senha.setRequired(true);
+            } else {
+                pessoa = cp.procurarId(idPessoa);
+                banco = pessoa.getContaL().get(0);
+                btnLabel = new Label("btnLabel", Model.of("Editar"));
+                senha.setRequired(false);
+            }
+
+        } catch (Exception e) {
             pessoa = new Pessoa();
             banco = new BancoBrasil();
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
             senha.setRequired(true);
-        } else {
-            pessoa = cp.procurarId(idPessoa);
-            banco = pessoa.getContaL().get(0);
-            btnLabel = new Label("btnLabel", Model.of("Editar"));
-            senha.setRequired(false);
         }
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
@@ -137,8 +146,8 @@ public class AddEditPessoa extends Panel {
         add(bodyMarkup);
 
     }
-    
-    public void fecharModal(AjaxRequestTarget target){
+
+    public void fecharModal(AjaxRequestTarget target) {
     }
 
 }

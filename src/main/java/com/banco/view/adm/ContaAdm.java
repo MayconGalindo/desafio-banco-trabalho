@@ -16,10 +16,9 @@
 package com.banco.view.adm;
 
 import com.banco.controller.ControllerBanco;
-import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
-import com.banco.model.Pessoa;
 import com.banco.view.adm.custom.AdmHeader;
+import java.text.ParseException;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
@@ -42,7 +41,7 @@ public final class ContaAdm extends WebPage {
     PageableListView listView;
     List<BancoBrasil> refreshLista = new ControllerBanco().listar();
 
-    public ContaAdm() {
+    public ContaAdm() throws ParseException{
 
         super();
         
@@ -54,6 +53,12 @@ public final class ContaAdm extends WebPage {
             @Override
             public void atualizarLista(AjaxRequestTarget target) {
                 refreshLista = new ControllerBanco().listar();
+                target.add(bodyMarkup);
+            }
+            
+            @Override
+            public void procurarLista(AjaxRequestTarget target, List list) {
+                refreshLista = list;
                 target.add(bodyMarkup);
             }
 
@@ -74,11 +79,18 @@ public final class ContaAdm extends WebPage {
             protected void populateItem(ListItem<BancoBrasil> item) {
 
                 BancoBrasil banco = item.getModelObject();
-
+                String estado;
+                if (banco.isEstadoConta()) {
+                    estado = "Sim";
+                } else {
+                    estado = "Não";
+                }
+                System.out.println("Conta: " + banco.isEstadoConta());
+                System.out.println("Estado: " + estado);
                 item.add(new Label("id", banco.getId()));
                 item.add(new Label("agencia", banco.getAgencia()));
                 item.add(new Label("conta", banco.getConta()));
-                item.add(new Label("estadoConta", banco.isEstadoConta()));
+                item.add(new Label("estadoConta", estado));
                 item.add(new Label("cpf", banco.getPessoa().getCpf()));
                 item.add(new Funcoes("funcoes", banco.getId(), false) {
 
@@ -93,7 +105,6 @@ public final class ContaAdm extends WebPage {
             }
 
         };
-        listView.setOutputMarkupPlaceholderTag(true);
         listView.setOutputMarkupId(true);
 
         bodyMarkup.add(listView);

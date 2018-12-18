@@ -15,8 +15,7 @@
  */
 package com.banco.controller.dao;
 
-import com.banco.model.BancoBrasil;
-import com.banco.model.Pessoa;
+import com.banco.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -28,13 +27,14 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
  */
 public abstract class SessionGenerator {
     
-    Class cls1 = BancoBrasil.class;
-    Class cls2 = Pessoa.class;
+    Class cls1 = BancoBrasil.class, cls2 = Pessoa.class, 
+            cls3 = Transferencia.class, cls4 = Contato.class;
     String caminho = "hibernate.cfg.xml";
     
     Configuration config = new Configuration()
             .configure(caminho)
-            .addAnnotatedClass(cls1).addAnnotatedClass(cls2);
+            .addAnnotatedClass(cls1).addAnnotatedClass(cls2)
+            .addAnnotatedClass(cls3).addAnnotatedClass(cls4);
     SessionFactory factory = config.buildSessionFactory();
 
     public Session getSession() {

@@ -15,6 +15,7 @@
  */
 package com.banco.view.usuario;
 
+import com.banco.controller.ControllerBanco;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import com.banco.view.usuario.custom.LinkSelecionar;
@@ -52,7 +53,7 @@ public final class ListarConta extends Panel {
 
             @Override
             protected Object load() {
-                return pessoa.getContaL();
+                return new ControllerBanco().contasPessoa(pessoa.getId());
             }
 
         };

@@ -159,11 +159,18 @@ public class Relatorio implements Serializable {
             BancoBrasil banco = new ControllerBanco().procurarId(id);
 
             row = sheet.createRow(1);
+            
+            String ativado;
+            if (banco.isEstadoConta()) {
+                ativado = "Sim";
+            } else {
+                ativado = "Não";
+            }
 
             row.createCell(0).setCellValue(banco.getId());
             row.createCell(1).setCellValue(banco.getConta());
             row.createCell(2).setCellValue(banco.getAgencia());
-            row.createCell(3).setCellValue(banco.isEstadoConta());
+            row.createCell(3).setCellValue(ativado);
             row.createCell(4).setCellValue(banco.getPessoa().getCpf());
 
             for (int i = 0; i < row.getHeight(); i++) {
@@ -192,7 +199,6 @@ public class Relatorio implements Serializable {
         map.put("agencia", banco.getAgencia());
         map.put("conta", banco.getConta());
         map.put("ativado", banco.isEstadoConta());
-        map.put("cpf", banco.getPessoa().getCpf());
 
         try {
 

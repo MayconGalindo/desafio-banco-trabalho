@@ -27,8 +27,8 @@ import javax.persistence.MappedSuperclass;
  * @author NOTEDESENVSP1
  */
 @MappedSuperclass
-public abstract class ContaDAOImpl implements ContaDAO, Serializable{
-
+public abstract class ContatoDAOImpl implements ContaDAO, Serializable{
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -40,25 +40,13 @@ public abstract class ContaDAOImpl implements ContaDAO, Serializable{
     @Column(name = "conta", unique = true, length = 6, nullable = false)
     private Integer conta;
 
-    @Column(name = "poupanca")
-    private double poupanca;
-
-    @Column(name = "corrente")
-    private double corrente;
-
-    @Column(name = "estadoConta")
-    private boolean estadoConta;
-
-    public ContaDAOImpl() {
+    public ContatoDAOImpl() {
     }
 
-    public ContaDAOImpl(Integer id, Integer agencia, Integer conta, double poupanca, double corrente, boolean estadoConta) {
-        this.id = id;
+    public ContatoDAOImpl(Integer agencia, Integer conta) {
+        this.id = null;
         this.agencia = agencia;
         this.conta = conta;
-        this.poupanca = poupanca;
-        this.corrente = corrente;
-        this.estadoConta = estadoConta;
     }
 
     /**
@@ -108,53 +96,5 @@ public abstract class ContaDAOImpl implements ContaDAO, Serializable{
     public void setConta(Integer conta) {
         this.conta = conta;
     }
-
-    /**
-     * @return the poupanca
-     */
-    @Override
-    public double getValorPoupanca() {
-        return poupanca;
-    }
-
-    /**
-     * @param poupanca the poupanca to set
-     */
-    @Override
-    public void setValorPoupanca(double poupanca) {
-        this.poupanca = poupanca;
-    }
-
-    /**
-     * @return the corrente
-     */
-    @Override
-    public double getValorCorrente() {
-        return corrente;
-    }
-
-    /**
-     * @param corrente the corrente to set
-     */
-    @Override
-    public void setValorCorrente(double corrente) {
-        this.corrente = corrente;
-    }
-
-    /**
-     * @return the estadoConta
-     */
-    @Override
-    public boolean isEstadoConta() {
-        return estadoConta;
-    }
-
-    /**
-     * @param estadoConta the estadoConta to set
-     */
-    @Override
-    public void setEstadoConta(boolean estadoConta) {
-        this.estadoConta = estadoConta;
-    }
-
+    
 }

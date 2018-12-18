@@ -16,10 +16,14 @@
 package com.banco.controller.dao;
 
 import com.banco.model.Pessoa;
+import com.banco.model.Transferencia;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -28,16 +32,18 @@ import org.hibernate.criterion.Restrictions;
  */
 public abstract class ControllerPessoaImpl extends SessionGenerator implements ControllerDAO<Pessoa>, Serializable {
 
+    List<Pessoa> list;
+    List<Transferencia> transf;
+    Session session = getSession();
+    Pessoa pessoa;
+
     @Override
     public void adicionarOuEditar(Pessoa pessoa) {
 
         try {
-
-            Session session = getSession();
             session.beginTransaction();
             session.saveOrUpdate(pessoa);
             session.getTransaction().commit();
-
         } catch (HibernateException e) {
             System.out.println(e);
         } finally {
@@ -50,13 +56,10 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
     public void excluir(int id) {
 
         try {
-
-            Session session = getSession();
             session.beginTransaction();
-            Pessoa pessoa = (Pessoa) session.get(Pessoa.class, id);
+            pessoa = (Pessoa) session.get(Pessoa.class, id);
             session.delete(pessoa);
             session.getTransaction().commit();
-
         } catch (HibernateException e) {
             System.out.println(e);
         } finally {
@@ -69,19 +72,34 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
     public List<Pessoa> listar() {
 
         try {
-
-            Session session = getSession();
             session.beginTransaction();
-            List<Pessoa> list = session.createCriteria(Pessoa.class).list();
+            list = session.createCriteria(Pessoa.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
             session.getTransaction().commit();
-
             return list;
-
         } catch (HibernateException e) {
-
             System.out.println(e);
             return null;
+        } finally {
+            closeSession();
+        }
 
+    }
+
+    public List<String> listarCpf() {
+
+        try {
+            session.beginTransaction();
+            list = session.createCriteria(Pessoa.class).list();
+            session.getTransaction().commit();
+
+            List<String> cpf = new ArrayList();
+            for (Pessoa pessoa : list) {
+                cpf.add(pessoa.getCpf());
+            }
+            return cpf;
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
         } finally {
             closeSession();
         }
@@ -91,64 +109,48 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
     @Override
     public List<Pessoa> procurar(String cpf) {
 
-        List<Pessoa> list = null;
-        Session session = getSession();
-        session.beginTransaction();
-
         try {
-
+            session.beginTransaction();
             if (cpf != null) {
-                list = session.createCriteria(Pessoa.class).add(Restrictions.like("cpf", cpf)).list();
+                list = session.createCriteria(Pessoa.class).add(Restrictions.like("cpf", cpf, MatchMode.ANYWHERE)).list();
+            } else {
+                list = session.createCriteria(Pessoa.class).list();
             }
             session.getTransaction().commit();
-
             return list;
-
         } catch (NullPointerException | HibernateException e) {
             System.out.println(e);
-            list = session.createCriteria(Pessoa.class).list();
-            session.getTransaction().commit();
-            return list;
+            return null;
         } finally {
             closeSession();
         }
 
     }
-    
+
     public Pessoa procurarId(Integer id) {
-        
+
         try {
-
-            Pessoa pessoa;
-            Session ses = getSession();
-            ses.beginTransaction();
-            pessoa = (Pessoa) ses.createCriteria(Pessoa.class).add(Restrictions.eq("id", id)).uniqueResult();
-            ses.getTransaction().commit();
-
+            session.beginTransaction();
+            pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("id", id)).uniqueResult();
+            session.getTransaction().commit();
             return pessoa;
-
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
         } finally {
             closeSession();
         }
-        
+
     }
 
     @Override
     public List<Pessoa> filtrar(String filtros) {
 
         try {
-
-            List<Pessoa> list;
-            Session ses = getSession();
-            ses.beginTransaction();
-            list = ses.createCriteria(Pessoa.class).add(Restrictions.eq("cidade", filtros)).list();
-            ses.getTransaction().commit();
-
+            session.beginTransaction();
+            list = session.createCriteria(Pessoa.class).add(Restrictions.eq("cidade", filtros)).list();
+            session.getTransaction().commit();
             return list;
-
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -157,19 +159,14 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         }
 
     }
-    
+
     public boolean validarLogin(String cpf, String senha) {
 
         try {
-
-            Pessoa pessoa;
-            Session session = getSession();
             session.beginTransaction();
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("cpf", cpf)).add(Restrictions.eq("senha", senha)).uniqueResult();
             session.getTransaction().commit();
-
             return senha.equals(pessoa.getSenha());
-
         } catch (NullPointerException | HibernateException e) {
             System.out.println(e);
             return false;
@@ -182,15 +179,10 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
     public Pessoa logar(String cpf, String senha) {
 
         try {
-            
-            Pessoa pessoa;
-            Session session = getSession();
             session.beginTransaction();
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("cpf", cpf)).add(Restrictions.eq("senha", senha)).uniqueResult();
             session.getTransaction().commit();
-            
             return pessoa;
-            
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -198,7 +190,42 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             closeSession();
         }
 
-        
+    }
+    
+    public List<Transferencia> listarTransferencia() {
+
+        try {
+            session.beginTransaction();
+            transf = session.createCriteria(Transferencia.class).list();
+            session.getTransaction().commit();
+            return transf;
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
+        } finally {
+            closeSession();
+        }
+
+    }
+
+    public List<Transferencia> filtrarTransferencia(Transferencia transferencia) {
+
+        try {
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(Transferencia.class);
+            if (!transferencia.getCpfDestinatario().equals("*")) criteria.add(Restrictions.eq("cpfDestinatario", transferencia.getCpfDestinatario()));
+            if (!transferencia.getCpfRemetente().equals("*")) criteria.add(Restrictions.eq("cpfRemetente", transferencia.getCpfRemetente()));
+            if (!transferencia.getTipoTranferencia().equals("*")) criteria.add(Restrictions.eq("tipoTranferencia", transferencia.getTipoTranferencia()));
+            if (transferencia.getValor() != 0) criteria.add(Restrictions.gt("valor", transferencia.getValor()));
+            transf = criteria.list();
+            session.getTransaction().commit();
+            return transf;
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
+        } finally {
+            closeSession();
+        }
 
     }
 

@@ -55,8 +55,12 @@ Contributor(s):
         
         <mapping package="com.banco.model.dao.PessoaDAOImpl"/>
         <mapping package="com.banco.model.dao.ContaDAOImpl"/>
+        <mapping package="com.banco.model.TransferenciaDAOImpl"/>
+        <mapping package="com.banco.model.ContatoDAOImpl"/>
         <mapping package="com.banco.model.Pessoa"/>
         <mapping package="com.banco.model.BancoBrasil"/>
+        <mapping package="com.banco.model.Transferencia"/>
+        <mapping package="com.banco.model.Contato"/>
         
     </session-factory>
     
