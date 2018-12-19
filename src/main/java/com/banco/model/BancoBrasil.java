@@ -38,13 +38,15 @@ public class BancoBrasil extends ContaDAOImpl implements Serializable {
         super();
     }
 
-    public BancoBrasil(Integer id, int agencia, int conta, double poupanca, double corrente, boolean estadoConta) {
-        super(id, agencia, conta, poupanca, corrente, estadoConta);
+    public BancoBrasil(int agencia, int conta, Pessoa pessoa) {
+        super(agencia, conta);
+        this.pessoa = pessoa;
     }
     
     @Override
     public String toString() {
-        return " ID: " + getId() + " Agencia: " + getAgencia() + " Conta: " + getConta() + " Poupança: " + getValorPoupanca() + " Corrente: " + getValorCorrente() + ", ";
+        return "\n ID: " + getId() + " Agencia: " + getAgencia() + " Conta: " + getConta() + 
+                " Poupança: " + getValorPoupanca() + " Corrente: " + getValorCorrente();
     }
 
     /**

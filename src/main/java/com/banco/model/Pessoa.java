@@ -65,7 +65,7 @@ public class Pessoa extends PessoaDAOImpl implements Serializable {
     @Override
     public String toString() {
         return "\n ID: " + getId() + " Tipo: " + getTipoConta() + " Nome: " + getNome() + " Senha: " + getSenha() + 
-                " Cpf: " + getCpf() +  " Cep: " + getCep() + " email: " + getEmail() + " tel: " + getTelefone();             
+                " Cpf: " + getCpf() +  " Cep: " + getCep() + " Email: " + getEmail() + " Tel: " + getTelefone();             
     }
     
     /**

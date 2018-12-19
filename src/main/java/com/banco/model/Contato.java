@@ -45,7 +45,7 @@ public class Contato extends ContatoDAOImpl implements Serializable {
 
     @Override
     public String toString() {
-        return "ID: " + getId() + "Agencia: " + getAgencia() + "Conta: " + getConta();
+        return "Agencia: " + getAgencia() + ", Conta: " + getConta();
     }
 
     /**

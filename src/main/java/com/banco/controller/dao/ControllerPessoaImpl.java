@@ -15,6 +15,7 @@
  */
 package com.banco.controller.dao;
 
+import com.banco.model.Contato;
 import com.banco.model.Pessoa;
 import com.banco.model.Transferencia;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
@@ -73,9 +75,7 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
         try {
             session.beginTransaction();
-            list = session.createCriteria(Pessoa.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
-            session.getTransaction().commit();
-            return list;
+            return session.createCriteria(Pessoa.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -90,11 +90,9 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         try {
             session.beginTransaction();
             list = session.createCriteria(Pessoa.class).list();
-            session.getTransaction().commit();
-
             List<String> cpf = new ArrayList();
-            for (Pessoa pessoa : list) {
-                cpf.add(pessoa.getCpf());
+            for (Pessoa p : list) {
+                cpf.add(p.getCpf());
             }
             return cpf;
         } catch (HibernateException e) {
@@ -109,18 +107,17 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
     @Override
     public List<Pessoa> procurar(String cpf) {
 
+        session.beginTransaction();
         try {
-            session.beginTransaction();
             if (cpf != null) {
                 list = session.createCriteria(Pessoa.class).add(Restrictions.like("cpf", cpf, MatchMode.ANYWHERE)).list();
             } else {
                 list = session.createCriteria(Pessoa.class).list();
             }
-            session.getTransaction().commit();
             return list;
         } catch (NullPointerException | HibernateException e) {
             System.out.println(e);
-            return null;
+            return session.createCriteria(Pessoa.class).list();
         } finally {
             closeSession();
         }
@@ -132,7 +129,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         try {
             session.beginTransaction();
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("id", id)).uniqueResult();
-            session.getTransaction().commit();
             return pessoa;
         } catch (HibernateException e) {
             System.out.println(e);
@@ -149,7 +145,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         try {
             session.beginTransaction();
             list = session.createCriteria(Pessoa.class).add(Restrictions.eq("cidade", filtros)).list();
-            session.getTransaction().commit();
             return list;
         } catch (HibernateException e) {
             System.out.println(e);
@@ -165,7 +160,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         try {
             session.beginTransaction();
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("cpf", cpf)).add(Restrictions.eq("senha", senha)).uniqueResult();
-            session.getTransaction().commit();
             return senha.equals(pessoa.getSenha());
         } catch (NullPointerException | HibernateException e) {
             System.out.println(e);
@@ -181,7 +175,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         try {
             session.beginTransaction();
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("cpf", cpf)).add(Restrictions.eq("senha", senha)).uniqueResult();
-            session.getTransaction().commit();
             return pessoa;
         } catch (HibernateException e) {
             System.out.println(e);
@@ -196,9 +189,7 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
         try {
             session.beginTransaction();
-            transf = session.createCriteria(Transferencia.class).list();
-            session.getTransaction().commit();
-            return transf;
+            return session.createCriteria(Transferencia.class).list();
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -218,7 +209,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             if (!transferencia.getTipoTranferencia().equals("*")) criteria.add(Restrictions.eq("tipoTranferencia", transferencia.getTipoTranferencia()));
             if (transferencia.getValor() != 0) criteria.add(Restrictions.gt("valor", transferencia.getValor()));
             transf = criteria.list();
-            session.getTransaction().commit();
             return transf;
         } catch (HibernateException e) {
             System.out.println(e);
@@ -227,6 +217,21 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             closeSession();
         }
 
+    }
+    
+    public List<Contato> listarContato(Integer id){
+        
+        try {
+            session.beginTransaction();
+            Query query = session.createQuery("FROM Contato where pessoa_id = :id").setParameter("id", id);
+            return query.list();
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
+        } finally {
+            closeSession();
+        }
+        
     }
 
 }

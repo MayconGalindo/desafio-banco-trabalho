@@ -36,6 +36,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
     Transferencia transferencia;
     Session session = getSession();
     List<BancoBrasil> list;
+    BancoBrasil banco;
     double saldo;
 
     @Override
@@ -58,7 +59,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
         try {
             session.beginTransaction();
-            BancoBrasil banco = (BancoBrasil) session.get(BancoBrasil.class, id);
+            banco = (BancoBrasil) session.get(BancoBrasil.class, id);
             session.delete(banco);
             session.getTransaction().commit();
         } catch (HibernateException e) {
@@ -73,7 +74,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
         try {
             session.beginTransaction();
-            BancoBrasil banco = (BancoBrasil) session.get(BancoBrasil.class, id);
+            banco = (BancoBrasil) session.get(BancoBrasil.class, id);
             if (banco.isEstadoConta()) {
                 banco.setEstadoConta(false);
             } else {
@@ -92,18 +93,12 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
     public List<BancoBrasil> listar() {
 
         try {
-
             session.beginTransaction();
             list = session.createCriteria(BancoBrasil.class).list();
-            session.getTransaction().commit();
-
             return list;
-
         } catch (HibernateException e) {
-
             System.out.println(e);
             return null;
-
         } finally {
             closeSession();
         }
@@ -113,21 +108,18 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
     @Override
     public List<BancoBrasil> procurar(Integer conta) {
 
-        try {
+        session.beginTransaction();
 
-            session.beginTransaction();
+        try {
             if (conta == null || conta == 0) {
                 list = session.createCriteria(BancoBrasil.class).list();
             } else {
                 list = session.createCriteria(BancoBrasil.class).add(Restrictions.like("conta", conta)).list();
             }
-            session.getTransaction().commit();
-
             return list;
-
         } catch (NullPointerException | HibernateException e) {
             System.out.println(e);
-            return null;
+            return session.createCriteria(BancoBrasil.class).list();
         } finally {
             closeSession();
         }
@@ -137,14 +129,9 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
     public BancoBrasil procurarId(Integer id) {
 
         try {
-
-            BancoBrasil banco;
             session.beginTransaction();
-            banco = (BancoBrasil) session.createCriteria(BancoBrasil.class).add(Restrictions.eq("id", id)).uniqueResult();
-            session.getTransaction().commit();
-
+            banco = (BancoBrasil) session.get(BancoBrasil.class, id);
             return banco;
-
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -160,7 +147,6 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
         try {
             session.beginTransaction();
             list = session.createCriteria(BancoBrasil.class).add(Restrictions.eq("cidade", cidades)).list();
-            session.getTransaction().commit();
             return list;
         } catch (HibernateException e) {
             System.out.println(e);
@@ -189,47 +175,47 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             session.beginTransaction();
             BancoBrasil contaAlvo = (BancoBrasil) session.createCriteria(BancoBrasil.class)
                     .add(Restrictions.eq("agencia", agencia)).add(Restrictions.eq("conta", conta)).uniqueResult();
+            banco = (BancoBrasil) session.get(BancoBrasil.class, contaUser);
 
             if (contaAlvo.getConta() == conta) {
 
                 if (acao) {
 
-                    saldo = pessoa.getContaL().get(contaUser).getValorCorrente() - valor;
+                    saldo = banco.getValorCorrente() - valor;
                     if (saldo >= 0 && valor > 0) {
-                        pessoa.getContaL().get(contaUser).setValorCorrente(saldo);
+                        banco.setValorCorrente(saldo);
                         contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
                         transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Corrente)", valor, contaAlvo.getPessoa().getCpf());
-                        if (contatoExistente(pessoa, agencia, conta)) {
-                            contato = new Contato(agencia, conta, pessoa);
-                            pessoa.getContatoL().add(contato);
-                            session.save(contato);
-                        }
                     } else {
                         return "Não é possivel transferir esse valor";
                     }
 
                 } else {
 
-                    saldo = pessoa.getContaL().get(contaUser).getValorPoupanca() - valor;
+                    saldo = banco.getValorPoupanca() - valor;
                     if (saldo >= 0 && valor > 0) {
-                        pessoa.getContaL().get(contaUser).setValorPoupanca(saldo);
+                        banco.setValorPoupanca(saldo);
                         contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
                         transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Poupança)", valor, contaAlvo.getPessoa().getCpf());
-                        if (contatoExistente(pessoa, agencia, conta)) {
-                            contato = new Contato(agencia, conta, pessoa);
-                            pessoa.getContatoL().add(contato);
-                            session.save(contato);
-                        }
                     } else {
                         return "Não é possivel transferir esse valor";
                     }
                 }
             }
-
-            session.update(pessoa);
+            
+            session.update(banco);
             session.update(contaAlvo);
             session.save(transferencia);
             session.getTransaction().commit();
+
+            try {
+                contato = new Contato(agencia, conta, pessoa);
+                session.save(contato);
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                System.out.println("Conta ja adicionada aos contatos");
+            }
+
             return "Valor transferido";
 
         } catch (NullPointerException | HibernateException | ParseException e) {
@@ -252,34 +238,35 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
         try {
 
+            session.beginTransaction();
+            banco = (BancoBrasil) session.get(BancoBrasil.class, conta);
+
             if (!acao) {
-                saldo = pessoa.getContaL().get(conta).getValorPoupanca() - valor;
+                saldo = banco.getValorPoupanca() - valor;
                 if (saldo >= 0 && valor > 0) {
-                    pessoa.getContaL().get(conta).setValorPoupanca(saldo);
-                    valor = pessoa.getContaL().get(conta).getValorCorrente() + valor;
-                    pessoa.getContaL().get(conta).setValorCorrente(valor);
+                    banco.setValorPoupanca(saldo);
+                    valor = banco.getValorCorrente() + valor;
+                    banco.setValorCorrente(valor);
                     transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Mesma Conta(Poupança para Corrente)", valor, pessoa.getCpf());
                 } else {
                     return "Não é possivel transferir esse valor";
                 }
 
             } else {
-                saldo = pessoa.getContaL().get(conta).getValorCorrente() - valor;
+                saldo = banco.getValorCorrente() - valor;
                 if (saldo >= 0 && valor > 0) {
-                    pessoa.getContaL().get(conta).setValorCorrente(saldo);
-                    valor = pessoa.getContaL().get(conta).getValorPoupanca() + valor;
-                    pessoa.getContaL().get(conta).setValorPoupanca(valor);
+                    banco.setValorCorrente(saldo);
+                    valor = banco.getValorPoupanca() + valor;
+                    banco.setValorPoupanca(valor);
                     transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Mesma Conta(Corrente para Poupança)", valor, pessoa.getCpf());
                 } else {
                     return "Não é possivel transferir esse valor";
                 }
             }
 
-            session.beginTransaction();
-            session.update(pessoa);
+            session.update(banco);
             session.save(transferencia);
             session.getTransaction().commit();
-
             return "Valor transferido";
 
         } catch (ParseException e) {
@@ -303,18 +290,20 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
         try {
 
+            session.beginTransaction();
+            banco = (BancoBrasil) session.get(BancoBrasil.class, conta);
+
             if (acao) {
-                valor = pessoa.getContaL().get(conta).getValorCorrente() + valor;
-                pessoa.getContaL().get(conta).setValorCorrente(valor);
+                valor = banco.getValorCorrente() + valor;
+                banco.setValorCorrente(valor);
                 transferencia = new Transferencia(pessoa.getCpf(), "Desposito(Corrente)", valor, pessoa.getCpf());
             } else {
-                valor = pessoa.getContaL().get(conta).getValorPoupanca() + valor;
-                pessoa.getContaL().get(conta).setValorPoupanca(valor);
+                valor = banco.getValorPoupanca() + valor;
+                banco.setValorPoupanca(valor);
                 transferencia = new Transferencia(pessoa.getCpf(), "Desposito(Poupança)", valor, pessoa.getCpf());
             }
 
-            session.beginTransaction();
-            session.update(pessoa);
+            session.update(banco);
             session.save(transferencia);
             session.getTransaction().commit();
             return "Deposito realizado";
@@ -340,27 +329,29 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
         try {
 
+            session.beginTransaction();
+            banco = (BancoBrasil) session.get(BancoBrasil.class, conta);
+
             if (acao) {
-                saldo = pessoa.getContaL().get(conta).getValorCorrente() - valor;
+                saldo = banco.getValorCorrente() - valor;
                 if (saldo >= 0 && valor > 0) {
-                    pessoa.getContaL().get(conta).setValorCorrente(saldo);
+                    banco.setValorCorrente(saldo);
                     transferencia = new Transferencia(pessoa.getCpf(), "Saque(Corrente)", valor, pessoa.getCpf());
                 } else {
                     return "Não é possivel saquar esse valor";
                 }
 
             } else {
-                saldo = pessoa.getContaL().get(conta).getValorPoupanca() - valor;
+                saldo = banco.getValorPoupanca() - valor;
                 if (saldo >= 0 && valor > 0) {
-                    pessoa.getContaL().get(conta).setValorPoupanca(saldo);
+                    banco.setValorPoupanca(saldo);
                     transferencia = new Transferencia(pessoa.getCpf(), "Saque(Poupanca)", valor, pessoa.getCpf());
                 } else {
                     return "Não é possivel saquar esse valor";
                 }
             }
 
-            session.beginTransaction();
-            session.update(pessoa);
+            session.update(banco);
             session.save(transferencia);
             session.getTransaction().commit();
             return "Valor saquado";
@@ -373,33 +364,20 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
         }
 
     }
-    
-    public List<BancoBrasil> contasPessoa(int id){
-        
+
+    public List<BancoBrasil> contasPessoa(int id) {
+
         try {
             session.beginTransaction();
-            Query query = session.createQuery("FROM BancoBrasil where pessoa_id = :id");
-            query.setParameter("id", id);
-            list = query.list();
-            session.getTransaction().commit();
-            return list;
+            Query query = session.createQuery("FROM BancoBrasil where pessoa_id = :id").setParameter("id", id);
+            return query.list();
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
         } finally {
             closeSession();
         }
-        
-    }
 
-    private boolean contatoExistente(Pessoa pessoa, int agencia, int conta) throws IndexOutOfBoundsException{
-
-        for (int i = 0; i < pessoa.getContatoL().size(); i++) {
-            if (pessoa.getContatoL().get(i).getAgencia() == agencia && pessoa.getContatoL().get(i).getConta() == conta) {
-                return false;
-            }
-        }
-        return true;
     }
 
 }

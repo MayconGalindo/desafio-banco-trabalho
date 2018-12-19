@@ -17,6 +17,7 @@ package com.banco.view.filtro;
 
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Transferencia;
+import com.googlecode.wicket.jquery.ui.form.dropdown.AjaxDropDownChoice;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;

@@ -20,6 +20,7 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import java.text.ParseException;
+import java.util.List;
 
 /**
  *
@@ -32,12 +33,11 @@ public class Teste {
         /*System.out.println(new ControllerPessoa().listar());
         
         Pessoa pessoa = new ControllerPessoa().listar().get(0);
-        new ControllerBanco().depositar(1000, pessoa, true, 0);
-        new ControllerBanco().depositar(1000, pessoa, false, 0);
-        pessoa = new ControllerPessoa().listar().get(0);
-        new ControllerBanco().transferirContaDiferente(pessoa, true, 0, 67010, 401523, 100);*/
-        
-        System.out.println(new ControllerBanco().contasPessoa(1));
+        //new ControllerBanco().depositar(1000, pessoa, true, 1);
+        System.out.println(new ControllerBanco().transferirContaDiferente(pessoa, true, 1, 67010, 401523, 100));*/
+        List lista = new ControllerPessoa().listarContato(1);
+        System.out.println(lista.get(0));
+        System.out.println(lista.get(1));
 
     }
 

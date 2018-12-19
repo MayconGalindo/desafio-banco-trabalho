@@ -32,7 +32,7 @@ public final class LinkSelecionar extends Panel {
     WebMarkupContainer markup;
     ModalWindow acao;
 
-    public LinkSelecionar(String id, Pessoa pessoa, String func, boolean cp, Integer idStr) {
+    public LinkSelecionar(String id, Pessoa pessoa, String func, boolean cp, Integer idConta) {
 
         super(id);
 
@@ -46,7 +46,7 @@ public final class LinkSelecionar extends Panel {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                acao.setContent(new Acao(acao.getContentId(), pessoa, func, cp, idStr));
+                acao.setContent(new Acao(acao.getContentId(), pessoa, func, cp, idConta));
                 acao.show(target);
             }
 

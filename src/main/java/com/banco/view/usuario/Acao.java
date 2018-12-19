@@ -20,7 +20,6 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import com.banco.view.InicioUsuario;
-import com.banco.view.usuario.validator.ValorValidator;
 import com.googlecode.wicket.jquery.ui.widget.dialog.MessageDialog;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -62,7 +61,7 @@ public final class Acao extends Panel {
      * @param id
      * @param sessao
      * @param funcao
-     * @param corOuPop Corrente ou Poupança
+     * @param corOuPop true = Corrente, false = Poupança
      * @param conta
      */
     public Acao(String id, Pessoa sessao, String funcao, boolean corOuPop, int conta) {
@@ -115,19 +114,19 @@ public final class Acao extends Panel {
                 switch (funcao) {
 
                     case "Dif":
-                        mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta - 2, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
+                        mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
                         break;
 
                     case "Mes":
-                        mensagem = cb.transferirMesmaConta(valor.getValorCorrente(), sessao, corOuPop, conta - 2);
+                        mensagem = cb.transferirMesmaConta(valor.getValorCorrente(), sessao, corOuPop, conta);
                         break;
 
                     case "Dep":
-                        mensagem = cb.depositar(valor.getValorCorrente(), sessao, corOuPop, conta - 2);
+                        mensagem = cb.depositar(valor.getValorCorrente(), sessao, corOuPop, conta);
                         break;
 
                     case "Saq":
-                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, corOuPop, conta - 2);
+                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, corOuPop, conta);
                         break;
 
                 }

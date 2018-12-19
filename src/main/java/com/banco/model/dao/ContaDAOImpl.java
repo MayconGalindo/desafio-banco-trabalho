@@ -52,13 +52,13 @@ public abstract class ContaDAOImpl implements ContaDAO, Serializable{
     public ContaDAOImpl() {
     }
 
-    public ContaDAOImpl(Integer id, Integer agencia, Integer conta, double poupanca, double corrente, boolean estadoConta) {
-        this.id = id;
+    public ContaDAOImpl(Integer agencia, Integer conta) {
+        this.id = null;
         this.agencia = agencia;
         this.conta = conta;
-        this.poupanca = poupanca;
-        this.corrente = corrente;
-        this.estadoConta = estadoConta;
+        this.poupanca = 0;
+        this.corrente = 0;
+        this.estadoConta = true;
     }
 
     /**

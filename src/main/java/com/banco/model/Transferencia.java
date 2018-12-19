@@ -39,7 +39,8 @@ public class Transferencia extends TransferenciaDAOImpl implements Serializable{
 
     @Override
     public String toString() {
-        return "Remetente: " + getCpfRemetente() + " Destinatario: " + getCpfDestinatario();
+        return "\n ID: " + getId() + "Remetente: " + getCpfRemetente() + " Destinatario: " + getCpfDestinatario() + 
+                " Valor: " + getValor() + " Tipo: " + getTipoTranferencia() + " Data: " + getDataTransf();
     }
     
 }
