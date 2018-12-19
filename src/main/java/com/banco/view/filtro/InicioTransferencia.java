@@ -16,9 +16,7 @@
 package com.banco.view.filtro;
 
 import com.banco.controller.ControllerPessoa;
-import com.banco.model.Pessoa;
 import com.banco.model.Transferencia;
-import com.banco.view.adm.Funcoes;
 import com.banco.view.adm.custom.AdmHeader;
 import java.text.ParseException;
 import java.util.List;

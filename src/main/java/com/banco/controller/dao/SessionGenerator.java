@@ -27,7 +27,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
  */
 public abstract class SessionGenerator {
     
-    Class cls1 = BancoBrasil.class, cls2 = Pessoa.class, 
+    private final Class cls1 = BancoBrasil.class, cls2 = Pessoa.class, 
             cls3 = Transferencia.class, cls4 = Contato.class;
     String caminho = "hibernate.cfg.xml";
     

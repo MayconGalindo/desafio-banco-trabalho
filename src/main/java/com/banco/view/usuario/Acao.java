@@ -18,11 +18,17 @@ package com.banco.view.usuario;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
+import com.banco.model.Contato;
 import com.banco.model.Pessoa;
 import com.banco.view.InicioUsuario;
 import com.googlecode.wicket.jquery.ui.widget.dialog.MessageDialog;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -33,6 +39,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.component.IRequestablePage;
+import org.apache.wicket.util.string.Strings;
 
 /**
  *
@@ -46,10 +53,12 @@ public final class Acao extends Panel {
     Form form;
     Label lblAgencia;
     Label lblConta;
-    TextField<String> agencia;
-    TextField<String> contaTransf;
+    AutoCompleteTextField<Integer> agencia;
+    AutoCompleteTextField<Integer> contaTransf;
     NumberTextField inp;
     MessageDialog aviso;
+    
+    List<Contato> contatos;
     ControllerBanco cb;
     ControllerPessoa cp;
     BancoBrasil valor;
@@ -68,6 +77,7 @@ public final class Acao extends Panel {
 
         super(id);
 
+        contatos = new ControllerPessoa().listarContato(sessao.getId());
         cb = new ControllerBanco();
         cp = new ControllerPessoa();
         valor = new BancoBrasil();
@@ -77,10 +87,70 @@ public final class Acao extends Panel {
         form = new Form("form", new CompoundPropertyModel<>(valor));
 
         lblAgencia = new Label("lblAgencia", Model.of("Agencia: "));
-        agencia = new TextField("agencia");
+        agencia = new AutoCompleteTextField("agencia"){
+            
+            @Override
+            protected Iterator getChoices(String input) {
+                
+                if (Strings.isEmpty(input))
+                {
+                    List<String> emptyList = Collections.emptyList();
+                    return emptyList.iterator();
+                }
+
+                List<Integer> choices = new ArrayList<>(10);
+
+                for (final Contato contato : contatos)
+                {
+                    final String agencia = contato.getAgencia().toString();
+
+                    if (agencia.toUpperCase().startsWith(input.toUpperCase()))
+                    {
+                        choices.add(contato.getAgencia());
+                        if (choices.size() == 10)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                return choices.iterator();
+            }
+            
+        };
         agencia.setOutputMarkupId(true);
         lblConta = new Label("lblConta", Model.of("Conta: "));
-        contaTransf = new TextField("conta");
+        contaTransf = new AutoCompleteTextField("conta"){
+            
+            @Override
+            protected Iterator getChoices(String input) {
+                
+                if (Strings.isEmpty(input))
+                {
+                    List<String> emptyList = Collections.emptyList();
+                    return emptyList.iterator();
+                }
+
+                List<Integer> choices = new ArrayList<>(10);
+
+                for (final Contato contato : contatos)
+                {
+                    final String conta = contato.getConta().toString();
+
+                    if (conta.toUpperCase().startsWith(input.toUpperCase()))
+                    {
+                        choices.add(contato.getConta());
+                        if (choices.size() == 10)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                return choices.iterator();
+            }
+            
+        };
         contaTransf.setOutputMarkupId(true);
 
         if (funcao.equals("Dif")) {

@@ -139,13 +139,11 @@ public class Funcoes extends Panel {
         }
 
         AbstractResourceStreamWriter stream = new AbstractResourceStreamWriter() {
-
             @Override
             public void write(OutputStream out) throws IOException {
                 out.write(bit);
                 out.close();
             }
-
         };
 
         ResourceStreamRequestHandler hand = new ResourceStreamRequestHandler(stream, arq);

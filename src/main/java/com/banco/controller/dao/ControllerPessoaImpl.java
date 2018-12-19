@@ -128,7 +128,7 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
         try {
             session.beginTransaction();
-            pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("id", id)).uniqueResult();
+            pessoa = (Pessoa) session.get(Pessoa.class, id);
             return pessoa;
         } catch (HibernateException e) {
             System.out.println(e);
@@ -225,9 +225,11 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             session.beginTransaction();
             Query query = session.createQuery("FROM Contato where pessoa_id = :id").setParameter("id", id);
             return query.list();
-        } catch (HibernateException e) {
+        } catch (HibernateException | NullPointerException e) {
             System.out.println(e);
-            return null;
+            List<Contato> lista = new ArrayList();
+            lista.add(new Contato(0, 0));
+            return lista;
         } finally {
             closeSession();
         }

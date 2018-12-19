@@ -42,10 +42,13 @@ public final class Funcao extends WebPage {
 
         super();
 
-        if (funcao.equals("Mes") || funcao.equals("Dif")) {
+        if (funcao.equals("Mes")) {
             lblCorrente = "Corrente para Poupança";
             lblPoupanca = "Poupança para Corrente";
-        } else {
+        } else if (funcao.equals("Dif")) {
+            lblCorrente = "Corrente para Corrente";
+            lblPoupanca = "Poupança para Poupança";
+        }  else {
             lblCorrente = "Corrente";
             lblPoupanca = "Poupança";
         }

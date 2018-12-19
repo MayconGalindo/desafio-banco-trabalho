@@ -17,7 +17,6 @@ package com.banco.view.filtro;
 
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Transferencia;
-import com.googlecode.wicket.jquery.ui.form.dropdown.AjaxDropDownChoice;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +47,14 @@ public class FiltroTransferencia extends Panel {
         
         super(id);
         
-        tipo.add("Transferecia Conta Diferente(Corrente)"); tipo.add("Transferecia Conta Diferente(Poupança)");
+        tipo.add("Transferecia Conta Diferente(Corrente para Corrente)"); tipo.add("Transferecia Conta Diferente(Poupança para Poupança)");
         tipo.add("Transferecia Mesma Conta(Poupança para Corrente)"); tipo.add("Transferecia Mesma Conta(Corrente para Poupança)");
         tipo.add("Desposito(Corrente)"); tipo.add("Desposito(Poupança)");
         tipo.add("Saque(Corrente)"); tipo.add("Saque(Poupança)");
         tipo.add("*");
         
         double val = 0;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             valor.add(val);
             val = val + 5000;
         }

@@ -19,14 +19,12 @@ import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.EmailTextField;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
@@ -35,7 +33,6 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.validation.validator.StringValidator;
 
 /**
  *
@@ -75,10 +72,10 @@ public final class AddEditConta extends Panel {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
                 pessoa = new ControllerPessoa().procurar(pessoa.getCpf()).get(0);
+                new ControllerPessoa().adicionarOuEditar(pessoa);
                 banco.setEstadoConta(true);
                 banco.setPessoa(pessoa);
-                pessoa.getContaL().add(banco);
-                new ControllerPessoa().adicionarOuEditar(pessoa);
+                new ControllerBanco().adicionarOuEditar(banco);
                 fecharModal(target);
             }
 

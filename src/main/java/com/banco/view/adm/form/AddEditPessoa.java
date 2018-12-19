@@ -15,6 +15,7 @@
  */
 package com.banco.view.adm.form;
 
+import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
@@ -46,11 +47,9 @@ public class AddEditPessoa extends Panel {
 
     WebMarkupContainer bodyMarkup;
     Form form;
-    TextField cpf;
-    TextField cep;
-    TextField uf;
+    TextField cpf, cep, uf, agencia, conta;
     PasswordTextField senha;
-    Label btnLabel;
+    Label btnLabel, agenciaLabel, contaLabel;
     AjaxButton submit;
 
     ControllerPessoa cp;
@@ -74,26 +73,24 @@ public class AddEditPessoa extends Panel {
 
         cp = new ControllerPessoa();
         senha = new PasswordTextField("senha");
+        agenciaLabel = new Label("agenciaLabel", Model.of("Agencia: "));
+        agencia = new TextField("agencia", new PropertyModel(banco, "agencia"));
+        contaLabel = new Label("contaLabel", Model.of("Conta: "));
+        conta = new TextField("conta", new PropertyModel(banco, "conta"));
 
-        try {
-
-            if (idPessoa == null) {
-                pessoa = new Pessoa();
-                banco = new BancoBrasil();
-                btnLabel = new Label("btnLabel", Model.of("Adicionar"));
-                senha.setRequired(true);
-            } else {
-                pessoa = cp.procurarId(idPessoa);
-                banco = pessoa.getContaL().get(0);
-                btnLabel = new Label("btnLabel", Model.of("Editar"));
-                senha.setRequired(false);
-            }
-
-        } catch (Exception e) {
+        if (idPessoa == null) {
             pessoa = new Pessoa();
             banco = new BancoBrasil();
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
             senha.setRequired(true);
+        } else {
+            pessoa = cp.procurarId(idPessoa);
+            btnLabel = new Label("btnLabel", Model.of("Editar"));
+            agenciaLabel.setVisible(false);
+            agencia.setVisible(false);
+            contaLabel.setVisible(false);
+            conta.setVisible(false);
+            senha.setRequired(false);
         }
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
@@ -110,9 +107,15 @@ public class AddEditPessoa extends Panel {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                banco.setPessoa(pessoa);
-                pessoa.getContaL().add(banco);
-                new ControllerPessoa().adicionarOuEditar(pessoa);
+                if (idPessoa == null) {
+                    new ControllerPessoa().adicionarOuEditar(pessoa);
+                    banco.setPessoa(pessoa);
+                    banco.setEstadoConta(true);
+                    new ControllerBanco().adicionarOuEditar(banco);
+                } else {
+                    new ControllerPessoa().adicionarOuEditar(pessoa);
+                }
+
                 fecharModal(target);
             }
 
@@ -137,8 +140,10 @@ public class AddEditPessoa extends Panel {
         form.add(new DropDownChoice("tipoConta", tipo));
         form.add(senha);
 
-        form.add(new TextField("agencia", new PropertyModel(banco, "agencia")));
-        form.add(new TextField("conta", new PropertyModel(banco, "conta")));
+        form.add(agenciaLabel);
+        form.add(agencia);
+        form.add(contaLabel);
+        form.add(conta);
 
         form.add(submit);
 

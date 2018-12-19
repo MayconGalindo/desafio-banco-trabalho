@@ -85,8 +85,6 @@ public final class ContaAdm extends WebPage {
                 } else {
                     estado = "Não";
                 }
-                System.out.println("Conta: " + banco.isEstadoConta());
-                System.out.println("Estado: " + estado);
                 item.add(new Label("id", banco.getId()));
                 item.add(new Label("agencia", banco.getAgencia()));
                 item.add(new Label("conta", banco.getConta()));

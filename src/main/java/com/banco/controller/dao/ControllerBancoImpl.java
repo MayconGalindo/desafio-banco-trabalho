@@ -185,7 +185,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                     if (saldo >= 0 && valor > 0) {
                         banco.setValorCorrente(saldo);
                         contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
-                        transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Corrente)", valor, contaAlvo.getPessoa().getCpf());
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Corrente para Corrente)", valor, contaAlvo.getPessoa().getCpf());
                     } else {
                         return "Não é possivel transferir esse valor";
                     }
@@ -196,26 +196,28 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                     if (saldo >= 0 && valor > 0) {
                         banco.setValorPoupanca(saldo);
                         contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
-                        transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Poupança)", valor, contaAlvo.getPessoa().getCpf());
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Poupança para Poupança)", valor, contaAlvo.getPessoa().getCpf());
                     } else {
                         return "Não é possivel transferir esse valor";
                     }
                 }
             }
-            
+
             session.update(banco);
             session.update(contaAlvo);
             session.save(transferencia);
             session.getTransaction().commit();
-
             try {
+                session = getSession();
+                session.beginTransaction();
                 contato = new Contato(agencia, conta, pessoa);
                 session.save(contato);
                 session.getTransaction().commit();
             } catch (HibernateException e) {
+                System.out.println(e);
                 System.out.println("Conta ja adicionada aos contatos");
             }
-
+            
             return "Valor transferido";
 
         } catch (NullPointerException | HibernateException | ParseException e) {

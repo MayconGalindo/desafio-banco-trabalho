@@ -37,6 +37,10 @@ public class Contato extends ContatoDAOImpl implements Serializable {
     public Contato() {
         super();
     }
+    
+    public Contato(Integer agencia, Integer conta) {
+        super(agencia, conta);
+    }
 
     public Contato(Integer agencia, Integer conta, Pessoa pessoa) {
         super(agencia, conta);
