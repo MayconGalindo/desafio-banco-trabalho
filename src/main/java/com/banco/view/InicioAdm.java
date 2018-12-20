@@ -90,7 +90,7 @@ public final class InicioAdm extends WebPage {
                 item.add(new Label("email", pessoa.getEmail()));
                 item.add(new Label("tipoConta", pessoa.getTipoConta()));
                 item.add(new Label("contas", new ControllerBanco().contasPessoa(pessoa.getId()).size()));
-                item.add(new Funcoes("funcoes", pessoa.getId(), true) {
+                item.add(new Funcoes("funcoes", pessoa.getId(), true, true) {
 
                     @Override
                     public void atualizarLista(AjaxRequestTarget target) {

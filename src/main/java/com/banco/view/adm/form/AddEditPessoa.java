@@ -58,6 +58,7 @@ public class AddEditPessoa extends Panel {
 
     List<Character> tipo = new ArrayList<>();
     JavaScriptResourceReference js = new JavaScriptResourceReference(AddEditPessoa.class, "AddEditPessoa.js");
+    private String senhaAlterada;
 
     @Override
     public void renderHead(IHeaderResponse response) {
@@ -91,6 +92,7 @@ public class AddEditPessoa extends Panel {
             contaLabel.setVisible(false);
             conta.setVisible(false);
             senha.setRequired(false);
+            senhaAlterada = pessoa.getSenha();
         }
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
@@ -113,7 +115,12 @@ public class AddEditPessoa extends Panel {
                     banco.setEstadoConta(true);
                     new ControllerBanco().adicionarOuEditar(banco);
                 } else {
-                    new ControllerPessoa().adicionarOuEditar(pessoa);
+                    try {
+                        if (!pessoa.getSenha().isEmpty()) new ControllerPessoa().adicionarOuEditar(pessoa);
+                    } catch (NullPointerException e) {
+                        pessoa.setSenha(senhaAlterada);
+                        new ControllerPessoa().adicionarOuEditar(pessoa);
+                    }
                 }
 
                 fecharModal(target);

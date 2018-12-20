@@ -16,6 +16,7 @@
 package com.banco.view.adm;
 
 import com.banco.controller.relatorio.Relatorio;
+import com.banco.view.adm.form.AddEditConta;
 import com.banco.view.adm.form.AddEditPessoa;
 import com.banco.view.adm.form.Delete;
 import java.io.IOException;
@@ -38,9 +39,9 @@ public class Funcoes extends Panel {
 
     ModalWindow modalDel;
     ModalWindow modalEdit;
-    WebMarkupContainer bodyMarkup;
+    private final WebMarkupContainer bodyMarkup;
 
-    public Funcoes(String id, Integer idPessoa, boolean pessoaOuBanco) {
+    public Funcoes(String id, Integer idPessoa, boolean pessoaOuBanco, boolean atvOuDtv) {
 
         super(id);
 
@@ -51,7 +52,7 @@ public class Funcoes extends Panel {
         modalDel.setOutputMarkupId(true);
         modalDel.setResizable(false);
         modalDel.setTitle("Excluir");
-        modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco) {
+        modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, atvOuDtv) {
 
             @Override
             public void fecharModal(AjaxRequestTarget target) {
@@ -64,8 +65,8 @@ public class Funcoes extends Panel {
         bodyMarkup.add(new AjaxLink("linkDel") {
 
             @Override
-            public void onClick(AjaxRequestTarget art) {
-                modalDel.show(art);
+            public void onClick(AjaxRequestTarget target) {
+                modalDel.show(target);
             }
 
         });
@@ -74,15 +75,23 @@ public class Funcoes extends Panel {
         modalEdit.setOutputMarkupId(true);
         modalEdit.setResizable(false);
         modalEdit.setTitle("Editar");
-        modalEdit.setContent(new AddEditPessoa(modalEdit.getContentId(), idPessoa) {
-
-            @Override
-            public void fecharModal(AjaxRequestTarget target) {
-                modalEdit.close(target);
-                atualizarLista(target);
-            }
-
-        });
+        if (pessoaOuBanco) {
+            modalEdit.setContent(new AddEditPessoa(modalEdit.getContentId(), idPessoa) {
+                @Override
+                public void fecharModal(AjaxRequestTarget target) {
+                    modalEdit.close(target);
+                    atualizarLista(target);
+                }
+            });
+        } else {
+            modalEdit.setContent(new AddEditConta(modalEdit.getContentId()) {
+                @Override
+                public void fecharModal(AjaxRequestTarget target) {
+                    modalEdit.close(target);
+                    atualizarLista(target);
+                }
+            });
+        }
         bodyMarkup.add(modalEdit);
         bodyMarkup.add(new AjaxLink("linkEdit") {
 
@@ -115,7 +124,7 @@ public class Funcoes extends Panel {
 
     }
 
-    void gerarRelatorio(Integer id, boolean excelOuPdf, boolean pessoaOuBanco) {
+    private void gerarRelatorio(Integer id, boolean excelOuPdf, boolean pessoaOuBanco) {
 
         byte[] bit;
         String arq;
@@ -155,5 +164,5 @@ public class Funcoes extends Panel {
 
     public void atualizarLista(AjaxRequestTarget target) {
     }
-
+        
 }

@@ -34,7 +34,7 @@ public class Delete extends Panel {
     AjaxLink link;
     String label, lblLink;
 
-    public Delete(String id, int idAlvo, boolean pessoaOuBanco) {
+    public Delete(String id, int idAlvo, boolean pessoaOuBanco, boolean ativDesa) {
 
         super(id);
 
@@ -42,12 +42,17 @@ public class Delete extends Panel {
             label = "Deseja excluir o Id: " + idAlvo;
             lblLink = "Excluir";
         } else {
-            label = "Deseja desativar a conta: " + idAlvo;
-            lblLink = "Desativar";
+            if (ativDesa) {
+                label = "Deseja desativar a conta: " + idAlvo;
+                lblLink = "Desativar";
+            } else {
+                label = "Deseja Ativar a conta: " + idAlvo;
+                lblLink = "Ativar";
+            }
         }
-        
+
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
-        
+
         link = new AjaxLink("excluir") {
 
             @Override
@@ -57,7 +62,6 @@ public class Delete extends Panel {
                 } else {
                     new ControllerBanco().ativarOuDesativar(idAlvo);
                 }
-
                 fecharModal(target);
             }
 
@@ -66,10 +70,11 @@ public class Delete extends Panel {
 
         bodyMarkup.add(new Label("funcLabel", Model.of(label)));
         bodyMarkup.add(link);
+        
         add(bodyMarkup);
     }
 
     public void fecharModal(AjaxRequestTarget target) {
     }
-
+    
 }

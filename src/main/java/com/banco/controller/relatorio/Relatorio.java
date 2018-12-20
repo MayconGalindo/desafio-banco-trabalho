@@ -19,6 +19,7 @@ import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
+import com.banco.model.Transferencia;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,14 +29,18 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -141,7 +146,7 @@ public class Relatorio implements Serializable {
         }
 
     }
-    
+
     public byte[] gerarExcelConta(Integer id) {
 
         try {
@@ -159,7 +164,7 @@ public class Relatorio implements Serializable {
             BancoBrasil banco = new ControllerBanco().procurarId(id);
 
             row = sheet.createRow(1);
-            
+
             String ativado;
             if (banco.isEstadoConta()) {
                 ativado = "Sim";
@@ -211,6 +216,88 @@ public class Relatorio implements Serializable {
             JasperPrint print = JasperFillManager.fillReport(report, map, con);
 
             String arq = "Relatorio Conta " + id + ".pdf";
+            File pdf = new File(arq);
+            FileOutputStream output = new FileOutputStream(pdf);
+
+            JasperExportManager.exportReportToPdfStream(print, output);
+
+            return Files.readAllBytes(pdf.toPath());
+
+        } catch (JRException | IOException | ClassNotFoundException | SQLException e) {
+            System.out.println(e);
+            return null;
+        }
+
+    }
+
+    public byte[] gerarExcelTransferencia(List<Transferencia> transferencias) {
+
+        try {
+
+            HSSFWorkbook work = new HSSFWorkbook();
+            HSSFSheet sheet = work.createSheet("Relatorio Transferencia");
+
+            Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("Id");
+            row.createCell(1).setCellValue("Cpf Remetente");
+            row.createCell(2).setCellValue("Cpf Destinatario");
+            row.createCell(3).setCellValue("Tipo");
+            row.createCell(4).setCellValue("Valor");
+            row.createCell(5).setCellValue("Data");
+
+            int i = 1;
+            for (Transferencia transferencia : transferencias) {
+                row = sheet.createRow(i);
+                row.createCell(0).setCellValue(transferencia.getId());
+                row.createCell(1).setCellValue(transferencia.getCpfRemetente());
+                row.createCell(2).setCellValue(transferencia.getCpfDestinatario());
+                row.createCell(3).setCellValue(transferencia.getTipoTranferencia());
+                row.createCell(4).setCellValue(transferencia.getValor());
+                row.createCell(5).setCellValue(transferencia.getDataTransf());
+                i++;
+            }
+
+            for (i = 0; i < row.getHeight(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            String file = "Relatorio Transferencia.xls";
+            File excel = new File(file);
+            FileOutputStream out = new FileOutputStream(excel);
+            work.write(out);
+            return Files.readAllBytes(excel.toPath());
+
+        } catch (IOException e) {
+            System.out.println(e);
+            return null;
+        }
+
+    }
+
+    public byte[] gerarPdfTransferencia(List<Transferencia> transferencias) {
+
+        Map<String, Object> map = new HashMap();
+
+        for (Transferencia transferencia : transferencias) {
+            map.put("id", transferencia.getId());
+            map.put("cpfR", transferencia.getCpfRemetente());
+            map.put("cpfD", transferencia.getCpfDestinatario());
+            map.put("tipo", transferencia.getTipoTranferencia());
+            map.put("valor", transferencia.getValor());
+            map.put("data", transferencia.getDataTransf());
+        }
+
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wicket?zeroDateTimeBehavior=convertToNull", "root", "");
+            String path = "RelatorioPdfTransferencia.jrxml";
+
+            InputStream arquivo = Relatorio.class.getResourceAsStream(path);
+            JasperReport report = (JasperReport) JasperCompileManager.compileReport(arquivo);
+            JasperPrint print = JasperFillManager.fillReport(report, map, con);
+
+            String arq = "Relatorio Transferencia.pdf";
             File pdf = new File(arq);
             FileOutputStream output = new FileOutputStream(pdf);
 

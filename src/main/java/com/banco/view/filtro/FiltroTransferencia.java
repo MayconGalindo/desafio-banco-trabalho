@@ -35,7 +35,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
  */
 public class FiltroTransferencia extends Panel {
     
-    WebMarkupContainer bodyMarkup;
+    private final WebMarkupContainer bodyMarkup;
     Form form;
     LoadableDetachableModel detachableModel;
     Transferencia transferencia;
@@ -90,7 +90,6 @@ public class FiltroTransferencia extends Panel {
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                super.onError(target); //To change body of generated methods, choose Tools | Templates.
             }
            
         });

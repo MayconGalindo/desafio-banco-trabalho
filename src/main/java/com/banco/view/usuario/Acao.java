@@ -28,12 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.NumberTextField;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -57,6 +57,7 @@ public final class Acao extends Panel {
     AutoCompleteTextField<Integer> contaTransf;
     NumberTextField inp;
     MessageDialog aviso;
+    AjaxButton submit;
     
     List<Contato> contatos;
     ControllerBanco cb;
@@ -84,6 +85,7 @@ public final class Acao extends Panel {
         markup = new WebMarkupContainer("bodyMarkup");
         markup.add(new FeedbackPanel("feedback"));
 
+     
         form = new Form("form", new CompoundPropertyModel<>(valor));
 
         lblAgencia = new Label("lblAgencia", Model.of("Agencia: "));
@@ -174,15 +176,12 @@ public final class Acao extends Panel {
         form.add(lblConta);
         form.add(agencia);
         form.add(contaTransf);
-        form.add(new AjaxButton("submit", form) {
+        submit = new AjaxButton("submit", form) {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
 
-                System.out.println("Teste OK");
-
                 switch (funcao) {
-
                     case "Dif":
                         mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
                         break;
@@ -198,23 +197,34 @@ public final class Acao extends Panel {
                     case "Saq":
                         mensagem = cb.saquar(valor.getValorCorrente(), sessao, corOuPop, conta);
                         break;
-
                 }
-
                 info(mensagem);
                 pessoa = cp.logar(sessao.getCpf(), sessao.getSenha());
                 page = new InicioUsuario(pessoa);
                 setResponsePage(page);
-
             }
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                System.out.println("Teste Erro");
             }
 
+        };
+        submit.setEnabled(false);
+        submit.setOutputMarkupId(true);
+        form.add(submit);
+        
+        form.add(new AjaxCheckBox("checkBox", Model.of(false)) {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (submit.isEnabled()) {
+                    submit.setEnabled(false);
+                } else {
+                    submit.setEnabled(true);
+                }
+                target.add(submit);
+            }
         });
-
+        
         markup.add(form);
         add(markup);
 

@@ -16,8 +16,11 @@
 package com.banco.view.filtro;
 
 import com.banco.controller.ControllerPessoa;
+import com.banco.controller.relatorio.Relatorio;
 import com.banco.model.Transferencia;
 import com.banco.view.adm.custom.AdmHeader;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -26,10 +29,14 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.PageableListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.util.resource.AbstractResourceStreamWriter;
 
 /**
  *
@@ -39,7 +46,7 @@ public final class InicioTransferencia extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
-    List<Transferencia> refreshLista = new ControllerPessoa().listarTransferencia();
+    List<Transferencia> refreshLista = new ControllerPessoa().listarTransferencia(null);
     
     public InicioTransferencia() throws ParseException{
         
@@ -67,6 +74,20 @@ public final class InicioTransferencia extends WebPage {
                 target.add(bodyMarkup);
             }
             
+        });
+        
+        bodyMarkup.add(new Link("pdf") {
+            @Override
+            public void onClick() {
+                gerarRelatorio(true);
+            }
+        });
+        
+        bodyMarkup.add(new Link("excel") {
+            @Override
+            public void onClick() {
+                gerarRelatorio(false);
+            }
         });
         
         listView = new PageableListView<Transferencia>("list", lista, 30) {
@@ -97,6 +118,33 @@ public final class InicioTransferencia extends WebPage {
     }
     
     public InicioTransferencia(PageParameters params) {
-        //TODO:  process page parameters
+    }
+    
+    private void gerarRelatorio(boolean tipo){
+        
+        byte[] bit;
+        String arq;
+
+            if (tipo) {
+                bit = new Relatorio().gerarPdfTransferencia(refreshLista);
+                arq = "Relatorio Transferencia.pdf";
+            } else {
+                bit = new Relatorio().gerarExcelTransferencia(refreshLista);
+                arq = "Relatorio Transferencia.xls";
+            }
+        
+
+        AbstractResourceStreamWriter stream = new AbstractResourceStreamWriter() {
+            @Override
+            public void write(OutputStream out) throws IOException {
+                out.write(bit);
+                out.close();
+            }
+        };
+
+        ResourceStreamRequestHandler hand = new ResourceStreamRequestHandler(stream, arq);
+        hand.setContentDisposition(ContentDisposition.ATTACHMENT);
+        hand.setFileName(arq);
+        getRequestCycle().scheduleRequestHandlerAfterCurrent(hand);
     }
 }

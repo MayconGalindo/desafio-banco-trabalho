@@ -185,11 +185,16 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
     }
     
-    public List<Transferencia> listarTransferencia() {
+    public List<Transferencia> listarTransferencia(Integer id) {
 
         try {
             session.beginTransaction();
-            return session.createCriteria(Transferencia.class).list();
+            if (id == null) {
+                return session.createCriteria(Transferencia.class).list();
+            } else {
+                return (List<Transferencia>) session.get(Transferencia.class, id);
+            }
+            
         } catch (HibernateException e) {
             System.out.println(e);
             return null;

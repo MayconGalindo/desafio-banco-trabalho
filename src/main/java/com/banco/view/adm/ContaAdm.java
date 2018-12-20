@@ -35,7 +35,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
  *
  * @author NOTEDESENVSP1
  */
-public final class ContaAdm extends WebPage {
+public class ContaAdm extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
@@ -90,13 +90,15 @@ public final class ContaAdm extends WebPage {
                 item.add(new Label("conta", banco.getConta()));
                 item.add(new Label("estadoConta", estado));
                 item.add(new Label("cpf", banco.getPessoa().getCpf()));
-                item.add(new Funcoes("funcoes", banco.getId(), false) {
+                item.add(new Funcoes("funcoes", banco.getId(), false, banco.isEstadoConta()) {
 
                     @Override
                     public void atualizarLista(AjaxRequestTarget target) {
                         refreshLista = new ControllerBanco().listar();
                         target.add(bodyMarkup);
                     }
+                    
+                    
 
                 });
 

@@ -38,7 +38,7 @@ import org.apache.wicket.model.PropertyModel;
  *
  * @author NOTEDESENVSP1
  */
-public final class AddEditConta extends Panel {
+public class AddEditConta extends Panel {
 
     WebMarkupContainer bodyMarkup;
     Form form;
