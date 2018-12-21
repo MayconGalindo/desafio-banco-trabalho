@@ -34,20 +34,25 @@ public class Delete extends Panel {
     AjaxLink link;
     String label, lblLink;
 
-    public Delete(String id, int idAlvo, boolean pessoaOuBanco, boolean ativDesa) {
+    public Delete(String id, int idAlvo, boolean pessoaOuBanco, boolean desOuExc, boolean ativDesa) {
 
         super(id);
 
         if (pessoaOuBanco) {
-            label = "Deseja excluir o Id: " + idAlvo;
+            label = "Deseja excluir a pessoa: " + idAlvo;
             lblLink = "Excluir";
         } else {
-            if (ativDesa) {
-                label = "Deseja desativar a conta: " + idAlvo;
-                lblLink = "Desativar";
+            if (desOuExc) {
+                if (ativDesa) {
+                    label = "Deseja desativar a conta: " + idAlvo;
+                    lblLink = "Desativar";
+                } else {
+                    label = "Deseja Ativar a conta: " + idAlvo;
+                    lblLink = "Ativar";
+                }
             } else {
-                label = "Deseja Ativar a conta: " + idAlvo;
-                lblLink = "Ativar";
+                label = "Deseja excluir a conta: " + idAlvo;
+                lblLink = "Excluir";
             }
         }
 
@@ -60,7 +65,12 @@ public class Delete extends Panel {
                 if (pessoaOuBanco) {
                     new ControllerPessoa().excluir(idAlvo);
                 } else {
-                    new ControllerBanco().ativarOuDesativar(idAlvo);
+                    if (desOuExc) {
+                        new ControllerBanco().ativarOuDesativar(idAlvo);
+                    } else {
+                        new ControllerBanco().excluir(idAlvo);
+                    }
+                    
                 }
                 fecharModal(target);
             }
@@ -70,11 +80,11 @@ public class Delete extends Panel {
 
         bodyMarkup.add(new Label("funcLabel", Model.of(label)));
         bodyMarkup.add(link);
-        
+
         add(bodyMarkup);
     }
 
     public void fecharModal(AjaxRequestTarget target) {
     }
-    
+
 }

@@ -173,9 +173,9 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
             Contato contato;
             session.beginTransaction();
+            banco = (BancoBrasil) session.get(BancoBrasil.class, contaUser);
             BancoBrasil contaAlvo = (BancoBrasil) session.createCriteria(BancoBrasil.class)
                     .add(Restrictions.eq("agencia", agencia)).add(Restrictions.eq("conta", conta)).uniqueResult();
-            banco = (BancoBrasil) session.get(BancoBrasil.class, contaUser);
 
             if (contaAlvo.isEstadoConta()) {
 
@@ -233,7 +233,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             closeSession();
         }
     }
-
+    
     /**
      *
      * @param valor

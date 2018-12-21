@@ -37,13 +37,15 @@ public class FiltroTransferencia extends Panel {
     
     private final WebMarkupContainer bodyMarkup;
     Form form;
-    LoadableDetachableModel detachableModel;
+    LoadableDetachableModel listaCpfR;
+    LoadableDetachableModel listaCpfD;
+    
     Transferencia transferencia;
     List<Double> valor = new ArrayList<>();
     List<String> tipo = new ArrayList<>();
     List<Transferencia> transferencias;
 
-    public FiltroTransferencia(String id) throws ParseException {
+    public FiltroTransferencia(String id, String cpf) throws ParseException {
         
         super(id);
         
@@ -64,10 +66,29 @@ public class FiltroTransferencia extends Panel {
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);
         
-        detachableModel = new LoadableDetachableModel<List<String>>() {
+        listaCpfR = new LoadableDetachableModel<List<String>>() {
             @Override
             protected List<String> load() {
-                List<String> list = new ControllerPessoa().listarCpf();
+                List<String> list;
+                if (cpf.length() == 0) {
+                    list = new ControllerPessoa().listarCpf();
+                } else {
+                    list = new ControllerPessoa().filtrarCpf(cpf, false);
+                }
+                list.add("*");
+                return list;
+            }
+        };
+        
+        listaCpfD = new LoadableDetachableModel<List<String>>() {
+            @Override
+            protected List<String> load() {
+                List<String> list;
+                if (cpf.length() == 0) {
+                    list = new ControllerPessoa().listarCpf();
+                } else {
+                    list = new ControllerPessoa().filtrarCpf(cpf, true);
+                }
                 list.add("*");
                 return list;
             }
@@ -75,8 +96,8 @@ public class FiltroTransferencia extends Panel {
         
         form = new Form("form", new CompoundPropertyModel<>(transferencia));
         
-        form.add(new DropDownChoice("cpfRemetente", detachableModel));
-        form.add(new DropDownChoice("cpfDestinatario", detachableModel));
+        form.add(new DropDownChoice("cpfRemetente", listaCpfR));
+        form.add(new DropDownChoice("cpfDestinatario", listaCpfD));
         form.add(new DropDownChoice("tipoTranferencia", tipo));
         form.add(new DropDownChoice("valor", valor));
         
@@ -84,7 +105,11 @@ public class FiltroTransferencia extends Panel {
            
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                transferencias = new ControllerPessoa().filtrarTransferencia(transferencia);
+                if (cpf.length() == 0) {
+                    transferencias = new ControllerPessoa().filtrarTransferencia(transferencia);
+                } else {
+                    transferencias = new ControllerPessoa().filtrarTransferenciaUsuario(transferencia, cpf);
+                }
                 atualizarLista(target, transferencias);
             }
 

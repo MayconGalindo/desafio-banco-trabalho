@@ -90,20 +90,14 @@ public class ContaAdm extends WebPage {
                 item.add(new Label("conta", banco.getConta()));
                 item.add(new Label("estadoConta", estado));
                 item.add(new Label("cpf", banco.getPessoa().getCpf()));
-                item.add(new Funcoes("funcoes", banco.getId(), false, banco.isEstadoConta()) {
-
+                item.add(new FuncoesAdm("funcoes", banco.getId(), false, banco.isEstadoConta()) {
                     @Override
                     public void atualizarLista(AjaxRequestTarget target) {
                         refreshLista = new ControllerBanco().listar();
                         target.add(bodyMarkup);
                     }
-                    
-                    
-
                 });
-
             }
-
         };
         listView.setOutputMarkupId(true);
 

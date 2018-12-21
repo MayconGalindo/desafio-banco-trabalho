@@ -17,7 +17,7 @@ package com.banco.view;
 
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import com.banco.view.usuario.Funcao;
+import com.banco.view.usuario.FuncoesUsuario;
 import com.banco.view.usuario.custom.HeaderUsuario;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -49,7 +49,7 @@ public final class InicioUsuario extends WebPage {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Mes");
+                page = new FuncoesUsuario(pessoa, "Mes");
                 setResponsePage(page);
             }
 
@@ -59,7 +59,7 @@ public final class InicioUsuario extends WebPage {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Dif");
+                page = new FuncoesUsuario(pessoa, "Dif");
                 setResponsePage(page);
             }
 
@@ -69,7 +69,7 @@ public final class InicioUsuario extends WebPage {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Dep");
+                page = new FuncoesUsuario(pessoa, "Dep");
                 setResponsePage(page);
             }
 
@@ -79,7 +79,7 @@ public final class InicioUsuario extends WebPage {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                page = new Funcao(pessoa, "Saq");
+                page = new FuncoesUsuario(pessoa, "Saq");
                 setResponsePage(page);
             }
 

@@ -15,9 +15,12 @@
  */
 package com.banco.view.usuario.custom;
 
+import java.text.ParseException;
+
 import com.banco.TelaLogin;
 import com.banco.model.Pessoa;
 import com.banco.view.InicioUsuario;
+import com.banco.view.filtro.InicioTransferencia;
 import com.banco.view.usuario.ListarConta;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -33,7 +36,8 @@ import org.apache.wicket.Session;
  */
 public final class HeaderUsuario extends Panel {
 
-    ModalWindow lista;
+    ModalWindow listaC;
+    ModalWindow listaT;
     WebMarkupContainer bodyMarkup;
     IRequestablePage page;
 
@@ -53,16 +57,30 @@ public final class HeaderUsuario extends Panel {
 
         });
 
-        lista = new ModalWindow("lista");
-        lista.setTitle("Minhas Contas");
-        lista.setContent(new ListarConta(lista.getContentId(), pessoa, null, true, true));
-        bodyMarkup.add(lista);
+        listaC = new ModalWindow("listaC");
+        listaC.setTitle("Minhas Contas");
+        listaC.setContent(new ListarConta(listaC.getContentId(), pessoa, null, true, true));
+        bodyMarkup.add(listaC);
 
         bodyMarkup.add(new AjaxLink("contas") {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                lista.show(target);
+                listaC.show(target);
+            }
+
+        });
+
+        bodyMarkup.add(new AjaxLink("transferencia") {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                try {
+                    page = new InicioTransferencia(pessoa.getCpf());
+                } catch (ParseException e) {
+					e.printStackTrace();
+				}
+                setResponsePage(page);
             }
 
         });

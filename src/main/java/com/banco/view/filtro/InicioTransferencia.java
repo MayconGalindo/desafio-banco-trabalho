@@ -19,6 +19,7 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.controller.relatorio.Relatorio;
 import com.banco.model.Transferencia;
 import com.banco.view.adm.custom.AdmHeader;
+import com.banco.view.usuario.custom.HeaderUsuario;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
@@ -46,16 +47,22 @@ public final class InicioTransferencia extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
-    List<Transferencia> refreshLista = new ControllerPessoa().listarTransferencia(null);
-    
-    public InicioTransferencia() throws ParseException{
-        
+    List<Transferencia> refreshLista;
+
+    public InicioTransferencia(String cpf) throws ParseException {
+
         super();
         
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);
 
-        bodyMarkup.add(new AdmHeader("header", true));
+        if (cpf.length() == 0) {
+            refreshLista = new ControllerPessoa().listarTransferencia("");
+            bodyMarkup.add(new AdmHeader("header", true));
+        } else {
+            refreshLista = new ControllerPessoa().listarTransferencia(cpf);
+            bodyMarkup.add(new HeaderUsuario("header", new ControllerPessoa().procurar(cpf).get(0)));
+        }
 
         IModel lista = new LoadableDetachableModel() {
 
@@ -66,30 +73,30 @@ public final class InicioTransferencia extends WebPage {
 
         };
 
-        bodyMarkup.add(new FiltroTransferencia("tableHeader"){
-            
+        bodyMarkup.add(new FiltroTransferencia("tableHeader", cpf) {
+
             @Override
             public void atualizarLista(AjaxRequestTarget target, List<Transferencia> lista) {
                 refreshLista = lista;
                 target.add(bodyMarkup);
             }
-            
+
         });
-        
+
         bodyMarkup.add(new Link("pdf") {
             @Override
             public void onClick() {
                 gerarRelatorio(true);
             }
         });
-        
+
         bodyMarkup.add(new Link("excel") {
             @Override
             public void onClick() {
                 gerarRelatorio(false);
             }
         });
-        
+
         listView = new PageableListView<Transferencia>("list", lista, 30) {
 
             @Override
@@ -114,25 +121,24 @@ public final class InicioTransferencia extends WebPage {
         bodyMarkup.add(new AjaxPagingNavigator("pag", listView));
 
         add(bodyMarkup);
-        
+
     }
-    
+
     public InicioTransferencia(PageParameters params) {
     }
-    
-    private void gerarRelatorio(boolean tipo){
-        
+
+    private void gerarRelatorio(boolean tipo) {
+
         byte[] bit;
         String arq;
 
-            if (tipo) {
-                bit = new Relatorio().gerarPdfTransferencia(refreshLista);
-                arq = "Relatorio Transferencia.pdf";
-            } else {
-                bit = new Relatorio().gerarExcelTransferencia(refreshLista);
-                arq = "Relatorio Transferencia.xls";
-            }
-        
+        if (tipo) {
+            bit = new Relatorio().gerarPdfTransferencia(refreshLista);
+            arq = "Relatorio Transferencia.pdf";
+        } else {
+            bit = new Relatorio().gerarExcelTransferencia(refreshLista);
+            arq = "Relatorio Transferencia.xls";
+        }
 
         AbstractResourceStreamWriter stream = new AbstractResourceStreamWriter() {
             @Override

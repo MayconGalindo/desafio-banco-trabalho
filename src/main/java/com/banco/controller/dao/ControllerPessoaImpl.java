@@ -25,6 +25,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
@@ -95,6 +96,38 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
                 cpf.add(p.getCpf());
             }
             return cpf;
+        } catch (HibernateException e) {
+            System.out.println(e);
+            return null;
+        } finally {
+            closeSession();
+        }
+
+    }
+
+    public List<String> filtrarCpf(String cpf, boolean RemeOuDest) {
+
+        try {
+            List<String> lista = new ArrayList();
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(Transferencia.class);
+            if (RemeOuDest) {
+                transf = criteria.add(Restrictions.eq("cpfRemetente", cpf)).list();
+                for (Transferencia t : transf) {
+                    if (!lista.contains(t.getCpfDestinatario())) {
+                        lista.add(t.getCpfDestinatario());
+                    }
+                }
+            } else {
+                transf = criteria.add(Restrictions.eq("cpfDestinatario", cpf)).list();
+                for (Transferencia t : transf) {
+                    if (!lista.contains(t.getCpfRemetente())) {
+                        lista.add(t.getCpfRemetente());
+                    }
+                }
+            }
+
+            return lista;
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -184,17 +217,36 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         }
 
     }
-    
-    public List<Transferencia> listarTransferencia(Integer id) {
+
+    public List<Contato> listarContato(Integer id) {
 
         try {
             session.beginTransaction();
-            if (id == null) {
+            Query query = session.createQuery("FROM Contato where pessoa_id = :id").setParameter("id", id);
+            return query.list();
+        } catch (HibernateException | NullPointerException e) {
+            System.out.println(e);
+            List<Contato> lista = new ArrayList();
+            lista.add(new Contato(0, 0));
+            return lista;
+        } finally {
+            closeSession();
+        }
+
+    }
+
+    public List<Transferencia> listarTransferencia(String cpf) {
+
+        try {
+            session.beginTransaction();
+            if (cpf.length() == 0) {
                 return session.createCriteria(Transferencia.class).list();
             } else {
-                return (List<Transferencia>) session.get(Transferencia.class, id);
+                Criteria criteria = session.createCriteria(Transferencia.class);
+                Criterion crit1 = Restrictions.eq("cpfRemetente", cpf);
+                Criterion crit2 = Restrictions.eq("cpfDestinatario", cpf);
+                return criteria.add(Restrictions.or(crit1, crit2)).list();
             }
-            
         } catch (HibernateException e) {
             System.out.println(e);
             return null;
@@ -209,10 +261,18 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         try {
             session.beginTransaction();
             Criteria criteria = session.createCriteria(Transferencia.class);
-            if (!transferencia.getCpfDestinatario().equals("*")) criteria.add(Restrictions.eq("cpfDestinatario", transferencia.getCpfDestinatario()));
-            if (!transferencia.getCpfRemetente().equals("*")) criteria.add(Restrictions.eq("cpfRemetente", transferencia.getCpfRemetente()));
-            if (!transferencia.getTipoTranferencia().equals("*")) criteria.add(Restrictions.eq("tipoTranferencia", transferencia.getTipoTranferencia()));
-            if (transferencia.getValor() != 0) criteria.add(Restrictions.gt("valor", transferencia.getValor()));
+            if (!transferencia.getCpfDestinatario().equals("*")) {
+                criteria.add(Restrictions.eq("cpfDestinatario", transferencia.getCpfDestinatario()));
+            }
+            if (!transferencia.getCpfRemetente().equals("*")) {
+                criteria.add(Restrictions.eq("cpfRemetente", transferencia.getCpfRemetente()));
+            }
+            if (!transferencia.getTipoTranferencia().equals("*")) {
+                criteria.add(Restrictions.eq("tipoTranferencia", transferencia.getTipoTranferencia()));
+            }
+            if (transferencia.getValor() != 0) {
+                criteria.add(Restrictions.gt("valor", transferencia.getValor()));
+            }
             transf = criteria.list();
             return transf;
         } catch (HibernateException e) {
@@ -223,22 +283,42 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
         }
 
     }
-    
-    public List<Contato> listarContato(Integer id){
-        
+
+    public List<Transferencia> filtrarTransferenciaUsuario(Transferencia transferencia, String cpf) {
+
         try {
+
             session.beginTransaction();
-            Query query = session.createQuery("FROM Contato where pessoa_id = :id").setParameter("id", id);
-            return query.list();
-        } catch (HibernateException | NullPointerException e) {
+            Criteria criteria = session.createCriteria(Transferencia.class);
+            String rem = transferencia.getCpfRemetente(), des = transferencia.getCpfDestinatario();
+
+            if (rem.equals("*") && des.equals("*") || !rem.equals(cpf) && !des.equals(cpf)) {
+                Criterion crit1 = Restrictions.eq("cpfRemetente", cpf);
+                Criterion crit2 = Restrictions.eq("cpfDestinatario", cpf);
+                criteria.add(Restrictions.or(crit1, crit2));
+            } else {
+                if (!rem.equals("*")) {
+                    criteria.add(Restrictions.eq("cpfRemetente", rem));
+                }
+                if (!des.equals("*")) {
+                    criteria.add(Restrictions.eq("cpfDestinatario", des));
+                }
+            }
+            if (!transferencia.getTipoTranferencia().equals("*")) {
+                criteria.add(Restrictions.eq("tipoTranferencia", transferencia.getTipoTranferencia()));
+            }
+            if (transferencia.getValor() != 0) {
+                criteria.add(Restrictions.gt("valor", transferencia.getValor()));
+            }
+
+            return criteria.list();
+        } catch (HibernateException e) {
             System.out.println(e);
-            List<Contato> lista = new ArrayList();
-            lista.add(new Contato(0, 0));
-            return lista;
+            return null;
         } finally {
             closeSession();
         }
-        
+
     }
 
 }

@@ -276,6 +276,7 @@ public class Relatorio implements Serializable {
 
     public byte[] gerarPdfTransferencia(List<Transferencia> transferencias) {
 
+        ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
         Map<String, Object> map = new HashMap();
 
         for (Transferencia transferencia : transferencias) {
@@ -285,17 +286,20 @@ public class Relatorio implements Serializable {
             map.put("tipo", transferencia.getTipoTranferencia());
             map.put("valor", transferencia.getValor());
             map.put("data", transferencia.getDataTransf());
+            arrayList.add(map);
         }
 
         try {
+            
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(arrayList);
 
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wicket?zeroDateTimeBehavior=convertToNull", "root", "");
             String path = "RelatorioPdfTransferencia.jrxml";
-
+            
             InputStream arquivo = Relatorio.class.getResourceAsStream(path);
             JasperReport report = (JasperReport) JasperCompileManager.compileReport(arquivo);
-            JasperPrint print = JasperFillManager.fillReport(report, map, con);
+            JasperPrint print = JasperFillManager.fillReport(report, map, dataSource);
 
             String arq = "Relatorio Transferencia.pdf";
             File pdf = new File(arq);

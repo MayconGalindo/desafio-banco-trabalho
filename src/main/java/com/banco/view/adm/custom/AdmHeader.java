@@ -168,7 +168,7 @@ public class AdmHeader extends Panel {
             @Override
             public void onClick(AjaxRequestTarget target) {
                 try {
-                    page = new InicioTransferencia();
+                    page = new InicioTransferencia("");
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

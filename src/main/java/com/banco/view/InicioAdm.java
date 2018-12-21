@@ -18,7 +18,7 @@ package com.banco.view;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
-import com.banco.view.adm.Funcoes;
+import com.banco.view.adm.FuncoesAdm;
 import com.banco.view.adm.custom.AdmHeader;
 import java.text.ParseException;
 import java.util.List;
@@ -90,7 +90,7 @@ public final class InicioAdm extends WebPage {
                 item.add(new Label("email", pessoa.getEmail()));
                 item.add(new Label("tipoConta", pessoa.getTipoConta()));
                 item.add(new Label("contas", new ControllerBanco().contasPessoa(pessoa.getId()).size()));
-                item.add(new Funcoes("funcoes", pessoa.getId(), true, true) {
+                item.add(new FuncoesAdm("funcoes", pessoa.getId(), true, true) {
 
                     @Override
                     public void atualizarLista(AjaxRequestTarget target) {
