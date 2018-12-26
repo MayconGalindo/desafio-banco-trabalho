@@ -15,30 +15,67 @@
  */
 package com.banco;
 
-import com.banco.controller.ControllerBanco;
-import com.banco.controller.ControllerPessoa;
-import com.banco.model.BancoBrasil;
-import com.banco.model.Pessoa;
+import com.banco.controller.relatorio.Relatorio;
+import com.banco.model.Transferencia;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
  *
  * @author NOTEDESENVSP1
  */
 public class Teste {
-
-    public static void main(String[] args) throws ParseException {
-
-        /*System.out.println(new ControllerPessoa().listar());
+    
+    public static void main(String[] args) {
         
-        Pessoa pessoa = new ControllerPessoa().listar().get(0);
-        //new ControllerBanco().depositar(1000, pessoa, true, 1);
-        System.out.println(new ControllerBanco().transferirContaDiferente(pessoa, true, 1, 67010, 401523, 100));*/
-        List lista = new ControllerPessoa().listarContato(1);
-        System.out.println(lista.get(0));
-        System.out.println(lista.get(1));
+        try {
+            
+            List<Transferencia> transferencias = new ArrayList<>();
+            
+            Transferencia a = new Transferencia("1", "1", 1.0, "1");
+            Transferencia b = new Transferencia("2", "2", 2.0, "2");
+            
+            transferencias.add(a);
+            transferencias.add(b);
+            
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(transferencias);
+            Map<String, Object> map = new HashMap();
+            map.put("DataSource", dataSource);
 
+            String path = "RelatorioPdfTransferencia.jrxml";
+            
+            InputStream arquivo = Relatorio.class.getResourceAsStream(path);
+            JasperReport report = (JasperReport) JasperCompileManager.compileReport(arquivo);
+            JasperPrint print = JasperFillManager.fillReport(report, map, dataSource);
+
+            String arq = "Relatorio Transferencia.pdf";
+            File pdf = new File(arq);
+            FileOutputStream output = new FileOutputStream(pdf);
+
+            JasperExportManager.exportReportToPdfStream(print, output);
+
+        } catch (JRException | IOException | ParseException e) {
+            System.out.println(e);
+        }
+        
     }
-
+    
 }

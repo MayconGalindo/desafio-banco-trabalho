@@ -72,6 +72,9 @@ public class AddEditPessoa extends Panel {
         tipo.add('U');
         tipo.add('A');
 
+        pessoa = new Pessoa();
+        banco = new BancoBrasil();
+
         cp = new ControllerPessoa();
         senha = new PasswordTextField("senha");
         agenciaLabel = new Label("agenciaLabel", Model.of("Agencia: "));
@@ -80,8 +83,6 @@ public class AddEditPessoa extends Panel {
         conta = new TextField("conta", new PropertyModel(banco, "conta"));
 
         if (idPessoa == null) {
-            pessoa = new Pessoa();
-            banco = new BancoBrasil();
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
             senha.setRequired(true);
         } else {
@@ -116,7 +117,9 @@ public class AddEditPessoa extends Panel {
                     new ControllerBanco().adicionarOuEditar(banco);
                 } else {
                     try {
-                        if (!pessoa.getSenha().isEmpty()) new ControllerPessoa().adicionarOuEditar(pessoa);
+                        if (!pessoa.getSenha().isEmpty()) {
+                            new ControllerPessoa().adicionarOuEditar(pessoa);
+                        }
                     } catch (NullPointerException e) {
                         pessoa.setSenha(senhaAlterada);
                         new ControllerPessoa().adicionarOuEditar(pessoa);
@@ -129,6 +132,7 @@ public class AddEditPessoa extends Panel {
             @Override
             protected void onError(AjaxRequestTarget target) {
                 super.onError(target); //To change body of generated methods, choose Tools | Templates.
+                System.out.println("Erro!");
             }
 
         };

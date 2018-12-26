@@ -15,6 +15,7 @@
  */
 package com.banco.controller.dao;
 
+import com.banco.model.Transferencia;
 import com.banco.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

@@ -24,12 +24,10 @@ import java.util.List;
  * @author NOTEDESENVSP1
  */
 public class ControllerBanco extends ControllerBancoImpl{
+	
+	public List<BancoBrasil> procurar(String cpf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public List<BancoBrasil> procurar(String cpf) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    
-    
 }

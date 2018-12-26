@@ -15,11 +15,11 @@
  */
 package com.banco.controller.relatorio;
 
+import com.banco.model.Transferencia;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import com.banco.model.Transferencia;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,11 +29,9 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -276,25 +274,12 @@ public class Relatorio implements Serializable {
 
     public byte[] gerarPdfTransferencia(List<Transferencia> transferencias) {
 
-        ArrayList<Map<String, Object>> arrayList = new ArrayList<>();
-        Map<String, Object> map = new HashMap();
-
-        for (Transferencia transferencia : transferencias) {
-            map.put("id", transferencia.getId());
-            map.put("cpfR", transferencia.getCpfRemetente());
-            map.put("cpfD", transferencia.getCpfDestinatario());
-            map.put("tipo", transferencia.getTipoTranferencia());
-            map.put("valor", transferencia.getValor());
-            map.put("data", transferencia.getDataTransf());
-            arrayList.add(map);
-        }
-
         try {
             
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(arrayList);
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(transferencias);
+            Map<String, Object> map = new HashMap();
+            map.put("DataSource", dataSource);
 
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wicket?zeroDateTimeBehavior=convertToNull", "root", "");
             String path = "RelatorioPdfTransferencia.jrxml";
             
             InputStream arquivo = Relatorio.class.getResourceAsStream(path);
@@ -309,7 +294,7 @@ public class Relatorio implements Serializable {
 
             return Files.readAllBytes(pdf.toPath());
 
-        } catch (JRException | IOException | ClassNotFoundException | SQLException e) {
+        } catch (JRException | IOException e) {
             System.out.println(e);
             return null;
         }

@@ -16,7 +16,6 @@
 package com.banco.view.adm;
 
 import com.banco.controller.relatorio.Relatorio;
-import com.banco.view.adm.form.AddEditConta;
 import com.banco.view.adm.form.AddEditPessoa;
 import com.banco.view.adm.form.Delete;
 import java.io.IOException;

@@ -25,7 +25,6 @@ import java.util.List;
  */
 public class ControllerPessoa extends ControllerPessoaImpl{
 
-    @Override
     public List<Pessoa> procurar(Integer conta) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

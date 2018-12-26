@@ -72,7 +72,6 @@ public class AddEditConta extends Panel {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
                 pessoa = new ControllerPessoa().procurar(pessoa.getCpf()).get(0);
-                new ControllerPessoa().adicionarOuEditar(pessoa);
                 banco.setEstadoConta(true);
                 banco.setPessoa(pessoa);
                 new ControllerBanco().adicionarOuEditar(banco);
@@ -82,6 +81,7 @@ public class AddEditConta extends Panel {
             @Override
             protected void onError(AjaxRequestTarget target) {
                 super.onError(target); //To change body of generated methods, choose Tools | Templates.
+                System.out.println("Erro Conta");
             }
 
         };

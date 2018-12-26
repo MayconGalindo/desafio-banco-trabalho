@@ -34,10 +34,12 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.NumberTextField;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.util.string.Strings;
 
@@ -51,20 +53,31 @@ public final class Acao extends Panel {
     WebMarkupContainer markup;
     FeedbackPanel feedback;
     Form form;
+    
+    Label lblTed;
+    Label lblBanco;
     Label lblAgencia;
     Label lblConta;
+
+    NumberTextField banco;
+    AjaxCheckBox checkBoxTed;
     AutoCompleteTextField<Integer> agencia;
     AutoCompleteTextField<Integer> contaTransf;
     NumberTextField inp;
+
     MessageDialog aviso;
     AjaxButton submit;
-    
+
     List<Contato> contatos;
     ControllerBanco cb;
     ControllerPessoa cp;
+
     BancoBrasil valor;
     Pessoa pessoa;
+
     String mensagem;
+    int numeroBanco;
+    boolean ted = false;
 
     /**
      *
@@ -79,38 +92,57 @@ public final class Acao extends Panel {
         super(id);
 
         contatos = new ControllerPessoa().listarContato(sessao.getId());
+        valor = new BancoBrasil();
+        
         cb = new ControllerBanco();
         cp = new ControllerPessoa();
-        valor = new BancoBrasil();
+        
         markup = new WebMarkupContainer("bodyMarkup");
         markup.add(new FeedbackPanel("feedback"));
 
-     
         form = new Form("form", new CompoundPropertyModel<>(valor));
+        
+        lblTed = new Label("lblTed", Model.of("Ted: "));
+        checkBoxTed = new AjaxCheckBox("checkBoxTed", new PropertyModel<Boolean>(this, "ted")) {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (banco.isEnabled()) {
+                    banco.setEnabled(false);
+                } else {
+                    banco.setEnabled(true);
+                }
+                target.add(banco);
+            }
+
+        };
+        checkBoxTed.setOutputMarkupId(true);
+        
+        lblBanco = new Label("lblBanco", Model.of("Banco: "));
+        banco = new NumberTextField("banco", new PropertyModel<>(this, "numeroBanco"));
+        banco.setMinimum(1);
+        banco.setOutputMarkupId(true);
+        banco.setEnabled(false);
 
         lblAgencia = new Label("lblAgencia", Model.of("Agencia: "));
-        agencia = new AutoCompleteTextField("agencia"){
-            
+        agencia = new AutoCompleteTextField("agencia") {
+
             @Override
             protected Iterator getChoices(String input) {
-                
-                if (Strings.isEmpty(input))
-                {
+
+                if (Strings.isEmpty(input)) {
                     List<String> emptyList = Collections.emptyList();
                     return emptyList.iterator();
                 }
 
                 List<Integer> choices = new ArrayList<>(10);
 
-                for (final Contato contato : contatos)
-                {
+                for (final Contato contato : contatos) {
                     final String agencia = contato.getAgencia().toString();
 
-                    if (agencia.toUpperCase().startsWith(input.toUpperCase()))
-                    {
+                    if (agencia.toUpperCase().startsWith(input.toUpperCase())) {
                         choices.add(contato.getAgencia());
-                        if (choices.size() == 10)
-                        {
+                        if (choices.size() == 10) {
                             break;
                         }
                     }
@@ -118,32 +150,29 @@ public final class Acao extends Panel {
 
                 return choices.iterator();
             }
-            
+
         };
         agencia.setOutputMarkupId(true);
+
         lblConta = new Label("lblConta", Model.of("Conta: "));
-        contaTransf = new AutoCompleteTextField("conta"){
-            
+        contaTransf = new AutoCompleteTextField("conta") {
+
             @Override
             protected Iterator getChoices(String input) {
-                
-                if (Strings.isEmpty(input))
-                {
+
+                if (Strings.isEmpty(input)) {
                     List<String> emptyList = Collections.emptyList();
                     return emptyList.iterator();
                 }
 
                 List<Integer> choices = new ArrayList<>(10);
 
-                for (final Contato contato : contatos)
-                {
+                for (final Contato contato : contatos) {
                     final String conta = contato.getConta().toString();
 
-                    if (conta.toUpperCase().startsWith(input.toUpperCase()))
-                    {
+                    if (conta.toUpperCase().startsWith(input.toUpperCase())) {
                         choices.add(contato.getConta());
-                        if (choices.size() == 10)
-                        {
+                        if (choices.size() == 10) {
                             break;
                         }
                     }
@@ -151,7 +180,7 @@ public final class Acao extends Panel {
 
                 return choices.iterator();
             }
-            
+
         };
         contaTransf.setOutputMarkupId(true);
 
@@ -159,6 +188,10 @@ public final class Acao extends Panel {
             agencia.setRequired(true);
             contaTransf.setRequired(true);
         } else {
+            lblTed.setVisible(false);
+            checkBoxTed.setVisible(false);
+            lblBanco.setVisible(false);
+            banco.setVisible(false);
             lblAgencia.setVisible(false);
             agencia.setVisible(false);
             lblConta.setVisible(false);
@@ -171,11 +204,18 @@ public final class Acao extends Panel {
         inp.setMinimum(0.1);
         inp.setOutputMarkupId(true);
 
+        form.add(lblTed);
+        form.add(checkBoxTed);
+        form.add(lblBanco);
+        form.add(banco);
+
         form.add(inp);
         form.add(lblAgencia);
-        form.add(lblConta);
         form.add(agencia);
+        
+        form.add(lblConta);
         form.add(contaTransf);
+        
         submit = new AjaxButton("submit", form) {
 
             @Override
@@ -183,7 +223,13 @@ public final class Acao extends Panel {
 
                 switch (funcao) {
                     case "Dif":
-                        mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
+                        if (ted) {
+                            mensagem = cb.transferirTed(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
+                            System.out.println("Banco: " + numeroBanco);
+                        } else {
+                            mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
+                        }
+                        
                         break;
 
                     case "Mes":
@@ -212,8 +258,8 @@ public final class Acao extends Panel {
         submit.setEnabled(false);
         submit.setOutputMarkupId(true);
         form.add(submit);
-        
-        form.add(new AjaxCheckBox("checkBox", Model.of(false)) {
+
+        form.add(new AjaxCheckBox("checkBoxSubmit", Model.of(false)) {
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
                 if (submit.isEnabled()) {
@@ -224,7 +270,7 @@ public final class Acao extends Panel {
                 target.add(submit);
             }
         });
-        
+
         markup.add(form);
         add(markup);
 

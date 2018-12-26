@@ -50,7 +50,7 @@ public final class TelaLogin extends WebPage {
         pessoa = new Pessoa();
         WebMarkupContainer markup = new WebMarkupContainer("bodyMarkup");
         FeedbackPanel feedbackPanel = new FeedbackPanel("feedback");
-        Form form = new Form("form", new CompoundPropertyModel<>(pessoa));
+        Form form = new Form("form", new CompoundPropertyModel(pessoa));
 
         senha = new PasswordTextField("senha");
         senha.setOutputMarkupId(true);

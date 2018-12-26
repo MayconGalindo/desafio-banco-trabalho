@@ -234,6 +234,60 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
         }
     }
     
+    public String transferirTed(Pessoa pessoa, boolean acao, int contaUser, int agencia, int conta, final double valor) {
+
+        try {
+
+            Contato contato;
+            session.beginTransaction();
+            banco = (BancoBrasil) session.get(BancoBrasil.class, contaUser);
+
+                    if (acao) {
+
+                        saldo = banco.getValorCorrente() - valor;
+                        if (saldo >= 0 && valor > 0) {
+                            banco.setValorCorrente(saldo);
+                            transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Ted(Corrente para Corrente)", valor, Integer.toString(conta));
+                        } else {
+                            return "Não é possivel transferir esse valor";
+                        }
+
+                    } else {
+
+                        saldo = banco.getValorPoupanca() - valor;
+                        if (saldo >= 0 && valor > 0) {
+                            banco.setValorPoupanca(saldo);
+                            transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Ted(Poupança para Poupança)", valor, Integer.toString(conta));
+                        } else {
+                            return "Não é possivel transferir esse valor";
+                        }
+                    }
+                
+
+                session.update(banco);
+                session.save(transferencia);
+                session.getTransaction().commit();
+                try {
+                    session = getSession();
+                    session.beginTransaction();
+                    contato = new Contato(agencia, conta, pessoa);
+                    session.save(contato);
+                    session.getTransaction().commit();
+                } catch (HibernateException e) {
+                    System.out.println(e);
+                    System.out.println("Conta ja adicionada aos contatos");
+                }
+
+                return "Valor transferido";
+
+        } catch (NullPointerException | HibernateException | ParseException e) {
+            System.out.println(e);
+            return "Conta errada ou inexistente";
+        } finally {
+            closeSession();
+        }
+    }
+    
     /**
      *
      * @param valor

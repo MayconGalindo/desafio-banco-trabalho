@@ -89,7 +89,15 @@ public class AdmHeader extends Panel {
             txtSearch = new PropertyModel<>(pessoa, "cpf");
         } else {
             titulo = "Adicionar Conta";
-            add = new AddEditConta(formAdd.getContentId());
+            add = new AddEditConta(formAdd.getContentId()){
+
+                @Override
+                public void fecharModal(AjaxRequestTarget target) {
+                    formAdd.close(target);
+                    atualizarLista(target);
+                }
+
+            };
             txtSearch = new PropertyModel<>(banco, "conta");
         }
 
