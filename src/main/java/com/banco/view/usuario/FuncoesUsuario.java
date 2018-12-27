@@ -37,36 +37,59 @@ public final class FuncoesUsuario extends WebPage {
     String lblPoupanca;
     AjaxLink corrente;
     AjaxLink poupanca;
+    AjaxLink corrente_poupanca;
+    AjaxLink poupanca_corrente;
 
     public FuncoesUsuario(Pessoa pessoa, String funcao) {
 
         super();
 
-        if (funcao.equals("Mes")) {
-            lblCorrente = "Corrente para Poupança";
-            lblPoupanca = "Poupança para Corrente";
-        } else if (funcao.equals("Dif")) {
+        corrente_poupanca = new AjaxLink("corrente_poupanca") {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                list.setContent(new ListarConta(list.getContentId(), pessoa, funcao, "CP", false));
+                list.show(target);
+            }
+
+        };
+        corrente_poupanca.setOutputMarkupId(true);
+
+        poupanca_corrente = new AjaxLink("poupanca_corrente") {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                list.setContent(new ListarConta(list.getContentId(), pessoa, funcao, "PC", false));
+                list.show(target);
+            }
+
+        };
+        poupanca_corrente.setOutputMarkupId(true);
+
+        if (funcao.equals("Mes") || funcao.equals("Dif")) {
             lblCorrente = "Corrente para Corrente";
             lblPoupanca = "Poupança para Poupança";
-        }  else {
+        } else {
             lblCorrente = "Corrente";
             lblPoupanca = "Poupança";
+            corrente_poupanca.setVisible(false);
+            poupanca_corrente.setVisible(false);
         }
 
         markBody = new WebMarkupContainer("bodyMarkup");
-        
+
         markBody.add(new HeaderUsuario("header", pessoa));
 
         list = new ModalWindow("lista");
         list.setTitle("Escolha a conta");
         list.setOutputMarkupId(true);
         markBody.add(list);
-        
+
         corrente = new AjaxLink("corrente") {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                list.setContent(new ListarConta(list.getContentId(), pessoa, funcao, true, false));
+                list.setContent(new ListarConta(list.getContentId(), pessoa, funcao, "CC", false));
                 list.show(target);
             }
 
@@ -78,13 +101,16 @@ public final class FuncoesUsuario extends WebPage {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                list.setContent(new ListarConta(list.getContentId(), pessoa, funcao, false, false));
+                list.setContent(new ListarConta(list.getContentId(), pessoa, funcao, "PP", false));
                 list.show(target);
             }
-            
+
         };
         poupanca.add(new Label("lblPoupanca", lblPoupanca));
         markBody.add(poupanca);
+
+        markBody.add(corrente_poupanca);
+        markBody.add(poupanca_corrente);
 
         add(markBody);
 

@@ -37,6 +37,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
     Session session = getSession();
     List<BancoBrasil> list;
     BancoBrasil banco;
+    Contato contato;
     double saldo;
 
     @Override
@@ -167,11 +168,10 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
      * @param valor
      * @return
      */
-    public String transferirContaDiferente(Pessoa pessoa, boolean acao, int contaUser, int agencia, int conta, final double valor) {
+    public String transferirContaDiferente(Pessoa pessoa, String acao, int contaUser, int agencia, int conta, final double valor) {
 
         try {
 
-            Contato contato;
             session.beginTransaction();
             banco = (BancoBrasil) session.get(BancoBrasil.class, contaUser);
             BancoBrasil contaAlvo = (BancoBrasil) session.createCriteria(BancoBrasil.class)
@@ -181,28 +181,53 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
 
                 if (contaAlvo.getConta() == conta) {
 
-                    if (acao) {
+                    switch (acao) {
 
-                        saldo = banco.getValorCorrente() - valor;
-                        if (saldo >= 0 && valor > 0) {
-                            banco.setValorCorrente(saldo);
-                            contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
-                            transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Corrente para Corrente)", valor, contaAlvo.getPessoa().getCpf());
-                        } else {
-                            return "Não é possivel transferir esse valor";
-                        }
+                        case "CC":
+                            saldo = banco.getValorCorrente() - valor;
+                            if (saldo >= 0 && valor > 0) {
+                                banco.setValorCorrente(saldo);
+                                contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Corrente para Corrente)", valor, contaAlvo.getPessoa().getCpf());
+                            } else {
+                                return "Não é possivel transferir esse valor";
+                            }
+                            break;
 
-                    } else {
+                        case "PP":
+                            saldo = banco.getValorPoupanca() - valor;
+                            if (saldo >= 0 && valor > 0) {
+                                banco.setValorPoupanca(saldo);
+                                contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Poupança para Poupança)", valor, contaAlvo.getPessoa().getCpf());
+                            } else {
+                                return "Não é possivel transferir esse valor";
+                            }
+                            break;
 
-                        saldo = banco.getValorPoupanca() - valor;
-                        if (saldo >= 0 && valor > 0) {
-                            banco.setValorPoupanca(saldo);
-                            contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
-                            transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Conta Diferente(Poupança para Poupança)", valor, contaAlvo.getPessoa().getCpf());
-                        } else {
-                            return "Não é possivel transferir esse valor";
-                        }
+                        case "CP":
+                            saldo = banco.getValorCorrente() - valor;
+                            if (saldo >= 0 && valor > 0) {
+                                banco.setValorCorrente(saldo);
+                                contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Corrente para Poupança)", valor, contaAlvo.getPessoa().getCpf());
+                            } else {
+                                return "Não é possivel transferir esse valor";
+                            }
+                            break;
+
+                        case "PC":
+                            saldo = banco.getValorPoupanca() - valor;
+                            if (saldo >= 0 && valor > 0) {
+                                banco.setValorPoupanca(saldo);
+                                contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Poupança para Corrente)", valor, contaAlvo.getPessoa().getCpf());
+                            } else {
+                                return "Não é possivel transferir esse valor";
+                            }
+                            break;
                     }
+
                 }
 
                 session.update(banco);
@@ -233,52 +258,73 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             closeSession();
         }
     }
-    
-    public String transferirTed(Pessoa pessoa, boolean acao, int contaUser, int agencia, int conta, final double valor) {
+
+    public String transferirTed(Pessoa pessoa, String acao, int contaUser, int agencia, int conta, final double valor) {
 
         try {
 
-            Contato contato;
             session.beginTransaction();
             banco = (BancoBrasil) session.get(BancoBrasil.class, contaUser);
 
-                    if (acao) {
+            switch (acao) {
 
-                        saldo = banco.getValorCorrente() - valor;
-                        if (saldo >= 0 && valor > 0) {
-                            banco.setValorCorrente(saldo);
-                            transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Ted(Corrente para Corrente)", valor, Integer.toString(conta));
-                        } else {
-                            return "Não é possivel transferir esse valor";
-                        }
-
+                case "CC":
+                    saldo = banco.getValorCorrente() - (valor + 5);
+                    if (saldo >= 0 && valor > 0) {
+                        banco.setValorCorrente(saldo);
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Ted(Corrente para Corrente)", valor, Integer.toString(conta));
                     } else {
-
-                        saldo = banco.getValorPoupanca() - valor;
-                        if (saldo >= 0 && valor > 0) {
-                            banco.setValorPoupanca(saldo);
-                            transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Ted(Poupança para Poupança)", valor, Integer.toString(conta));
-                        } else {
-                            return "Não é possivel transferir esse valor";
-                        }
+                        return "Não é possivel transferir esse valor";
                     }
-                
+                    break;
 
-                session.update(banco);
-                session.save(transferencia);
+                case "PP":
+                    saldo = banco.getValorPoupanca() - (valor + 5);
+                    if (saldo >= 0 && valor > 0) {
+                        banco.setValorPoupanca(saldo);
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Ted(Poupança para Poupança)", valor, Integer.toString(conta));
+                    } else {
+                        return "Não é possivel transferir esse valor";
+                    }
+                    break;
+
+                case "CP":
+                    saldo = banco.getValorCorrente() - (valor + 5);
+                    if (saldo >= 0 && valor > 0) {
+                        banco.setValorCorrente(saldo);
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Ted(Corrente para Poupança)", valor, Integer.toString(conta));
+                    } else {
+                        return "Não é possivel transferir esse valor";
+                    }
+                    break;
+
+                case "PC":
+                    saldo = banco.getValorPoupanca() - (valor + 5);
+                    if (saldo >= 0 && valor > 0) {
+                        banco.setValorPoupanca(saldo);
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Ted(Poupança para Poupança)", valor, Integer.toString(conta));
+                    } else {
+                        return "Não é possivel transferir esse valor";
+                    }
+                    break;
+
+            }
+
+            session.update(banco);
+            session.save(transferencia);
+            session.getTransaction().commit();
+            try {
+                session = getSession();
+                session.beginTransaction();
+                contato = new Contato(agencia, conta, pessoa);
+                session.save(contato);
                 session.getTransaction().commit();
-                try {
-                    session = getSession();
-                    session.beginTransaction();
-                    contato = new Contato(agencia, conta, pessoa);
-                    session.save(contato);
-                    session.getTransaction().commit();
-                } catch (HibernateException e) {
-                    System.out.println(e);
-                    System.out.println("Conta ja adicionada aos contatos");
-                }
+            } catch (HibernateException e) {
+                System.out.println(e);
+                System.out.println("Conta ja adicionada aos contatos");
+            }
 
-                return "Valor transferido";
+            return "Valor transferido";
 
         } catch (NullPointerException | HibernateException | ParseException e) {
             System.out.println(e);
@@ -287,7 +333,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             closeSession();
         }
     }
-    
+
     /**
      *
      * @param valor
@@ -296,31 +342,30 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
      * @param conta
      * @return
      */
-    public String transferirMesmaConta(final double valor, Pessoa pessoa, boolean acao, int conta) {
+    public String transferirMesmaConta(final double valor, Pessoa pessoa, String acao, int conta) {
 
         try {
 
             session.beginTransaction();
             banco = (BancoBrasil) session.get(BancoBrasil.class, conta);
 
-            if (!acao) {
-                saldo = banco.getValorPoupanca() - valor;
-                if (saldo >= 0 && valor > 0) {
-                    banco.setValorPoupanca(saldo);
-                    saldo = banco.getValorCorrente() + valor;
-                    banco.setValorCorrente(saldo);
-                    transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Mesma Conta(Poupança para Corrente)", valor, pessoa.getCpf());
-                } else {
-                    return "Não é possivel transferir esse valor";
-                }
-
-            } else {
+            if (acao.equals("CP")) {
                 saldo = banco.getValorCorrente() - valor;
                 if (saldo >= 0 && valor > 0) {
                     banco.setValorCorrente(saldo);
                     saldo = banco.getValorPoupanca() + valor;
                     banco.setValorPoupanca(saldo);
-                    transferencia = new Transferencia(pessoa.getCpf(), "Transferecia Mesma Conta(Corrente para Poupança)", valor, pessoa.getCpf());
+                    transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Mesma Conta(Corrente para Poupança)", valor, pessoa.getCpf());
+                } else {
+                    return "Não é possivel transferir esse valor";
+                }
+            } else {
+                saldo = banco.getValorPoupanca() - valor;
+                if (saldo >= 0 && valor > 0) {
+                    banco.setValorPoupanca(saldo);
+                    saldo = banco.getValorCorrente() + valor;
+                    banco.setValorCorrente(saldo);
+                    transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Mesma Conta(Poupança para Corrente)", valor, pessoa.getCpf());
                 } else {
                     return "Não é possivel transferir esse valor";
                 }
@@ -348,14 +393,14 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
      * @param conta
      * @return
      */
-    public String depositar(final double valor, Pessoa pessoa, boolean acao, int conta) {
+    public String depositar(final double valor, Pessoa pessoa, String acao, int conta) {
 
         try {
 
             session.beginTransaction();
             banco = (BancoBrasil) session.get(BancoBrasil.class, conta);
 
-            if (acao) {
+            if (acao.equals("CC")) {
                 saldo = banco.getValorCorrente() + valor;
                 banco.setValorCorrente(saldo);
                 transferencia = new Transferencia(pessoa.getCpf(), "Desposito(Corrente)", valor, pessoa.getCpf());
@@ -387,14 +432,14 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
      * @param conta
      * @return
      */
-    public String saquar(final double valor, Pessoa pessoa, boolean acao, int conta) {
+    public String saquar(final double valor, Pessoa pessoa, String acao, int conta) {
 
         try {
 
             session.beginTransaction();
             banco = (BancoBrasil) session.get(BancoBrasil.class, conta);
 
-            if (acao) {
+            if (acao.equals("CC")) {
                 saldo = banco.getValorCorrente() - valor;
                 if (saldo >= 0 && valor > 0) {
                     banco.setValorCorrente(saldo);

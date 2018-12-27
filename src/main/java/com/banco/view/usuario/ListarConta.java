@@ -19,6 +19,7 @@ import com.banco.controller.ControllerBanco;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import com.banco.view.usuario.custom.LinkSelecionar;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -40,7 +41,7 @@ public final class ListarConta extends Panel {
     LinkSelecionar selecionar;
     Label lblSelecionar;
     
-    public ListarConta(String id, Pessoa pessoa, String func, boolean cp, boolean inicio) {
+    public ListarConta(String id, Pessoa pessoa, String func, String tipo, boolean inicio) {
 
         super(id);
 
@@ -65,7 +66,7 @@ public final class ListarConta extends Panel {
 
                 BancoBrasil conta = item.getModelObject();
 
-                selecionar = new LinkSelecionar("selecionar", pessoa, func, cp, conta.getId());
+                selecionar = new LinkSelecionar("selecionar", pessoa, func, tipo, conta.getId());
 
                 if (inicio == true) {
                     selecionar.setVisible(false);
@@ -90,4 +91,5 @@ public final class ListarConta extends Panel {
         add(markup);
 
     }
+    
 }

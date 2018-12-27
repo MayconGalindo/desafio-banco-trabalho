@@ -20,8 +20,8 @@ import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import com.banco.view.InicioAdm;
-import com.banco.view.InicioUsuario;
+import com.banco.view.adm.InicioAdm;
+import com.banco.view.usuario.InicioUsuario;
 import com.banco.view.adm.ContaAdm;
 import com.banco.view.adm.form.AddEditConta;
 import com.banco.view.adm.form.AddEditPessoa;
@@ -56,15 +56,17 @@ public class AdmHeader extends Panel {
     IRequestablePage page;
     Form searchForm;
     ModalWindow formAdd;
-    Pessoa pessoa;
-    BancoBrasil banco;
     Component add;
     CompoundPropertyModel model;
     PropertyModel txtSearch;
+    AjaxLink btnAdd; 
+
+    Pessoa pessoa;
+    BancoBrasil banco;
     String titulo;
     List searchList;
 
-    public AdmHeader(String id, boolean pagina) throws ParseException {
+    public AdmHeader(String id, boolean pagina, boolean remover) throws ParseException {
 
         super(id);
 
@@ -103,9 +105,10 @@ public class AdmHeader extends Panel {
 
         formAdd.setTitle(titulo);
         formAdd.setContent(add);
+        formAdd.setOutputMarkupId(true);
         bodyMarkup.add(formAdd);
 
-        bodyMarkup.add(new AjaxLink("btnAdd") {
+        btnAdd = new AjaxLink("btnAdd") {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
@@ -113,7 +116,9 @@ public class AdmHeader extends Panel {
                 atualizarLista(target);
             }
 
-        });
+        };
+        btnAdd.setOutputMarkupId(true);
+        bodyMarkup.add(btnAdd);
 
         searchForm = new Form<>("searchForm");
 
@@ -139,6 +144,7 @@ public class AdmHeader extends Panel {
             }
 
         });
+        searchForm.setOutputMarkupId(true);
         bodyMarkup.add(searchForm);
 
         bodyMarkup.add(new AjaxLink("usuario") {
@@ -197,6 +203,12 @@ public class AdmHeader extends Panel {
         });
 
         add(bodyMarkup);
+
+        if (remover){
+            formAdd.setVisible(false);
+            btnAdd.setVisible(false);
+            searchForm.setVisible(false);
+        } 
 
     }
 

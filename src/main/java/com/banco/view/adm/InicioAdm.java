@@ -16,7 +16,8 @@
 package com.banco.view.adm;
 
 import com.banco.controller.ControllerBanco;
-import com.banco.model.BancoBrasil;
+import com.banco.controller.ControllerPessoa;
+import com.banco.model.Pessoa;
 import com.banco.view.adm.custom.AdmHeader;
 import java.text.ParseException;
 import java.util.List;
@@ -35,33 +36,33 @@ import org.apache.wicket.model.LoadableDetachableModel;
  *
  * @author NOTEDESENVSP1
  */
-public class ContaAdm extends WebPage {
+public final class InicioAdm extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
-    List<BancoBrasil> refreshLista = new ControllerBanco().listar();
+    List<Pessoa> refreshLista = new ControllerPessoa().listar();
 
-    public ContaAdm() throws ParseException{
+    public InicioAdm() throws ParseException{
 
         super();
-        
+
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);
 
-        bodyMarkup.add(new AdmHeader("header", false, false) {
+        bodyMarkup.add(new AdmHeader("header", true, false) {
 
             @Override
             public void atualizarLista(AjaxRequestTarget target) {
-                refreshLista = new ControllerBanco().listar();
+                refreshLista = new ControllerPessoa().listar();
                 target.add(bodyMarkup);
             }
-            
+
             @Override
             public void procurarLista(AjaxRequestTarget target, List list) {
                 refreshLista = list;
                 target.add(bodyMarkup);
             }
-
+            
         });
 
         IModel lista = new LoadableDetachableModel() {
@@ -73,32 +74,35 @@ public class ContaAdm extends WebPage {
 
         };
 
-        listView = new PageableListView<BancoBrasil>("list", lista, 30) {
+        listView = new PageableListView<Pessoa>("list", lista, 30) {
 
             @Override
-            protected void populateItem(ListItem<BancoBrasil> item) {
+            protected void populateItem(ListItem<Pessoa> item) {
 
-                BancoBrasil banco = item.getModelObject();
-                String estado;
-                if (banco.isEstadoConta()) {
-                    estado = "Sim";
-                } else {
-                    estado = "Não";
-                }
-                item.add(new Label("id", banco.getId()));
-                item.add(new Label("agencia", banco.getAgencia()));
-                item.add(new Label("conta", banco.getConta()));
-                item.add(new Label("estadoConta", estado));
-                item.add(new Label("cpf", banco.getPessoa().getCpf()));
-                item.add(new FuncoesAdm("funcoes", banco.getId(), false, banco.isEstadoConta()) {
+                Pessoa pessoa = item.getModelObject();
+
+                item.add(new Label("id", pessoa.getId()));
+                item.add(new Label("nome", pessoa.getNome()));
+                item.add(new Label("cpf", pessoa.getCpf()));
+                item.add(new Label("cep", pessoa.getCep()));
+                item.add(new Label("endereco", pessoa.getEndereco() + ", " + pessoa.getNumero()));
+                item.add(new Label("email", pessoa.getEmail()));
+                item.add(new Label("tipoConta", pessoa.getTipoConta()));
+                item.add(new Label("contas", new ControllerBanco().contasPessoa(pessoa.getId()).size()));
+                item.add(new FuncoesAdm("funcoes", pessoa.getId(), true, true) {
+
                     @Override
                     public void atualizarLista(AjaxRequestTarget target) {
-                        refreshLista = new ControllerBanco().listar();
+                        refreshLista = new ControllerPessoa().listar();
                         target.add(bodyMarkup);
                     }
+
                 });
+
             }
+
         };
+        listView.setOutputMarkupPlaceholderTag(true);
         listView.setOutputMarkupId(true);
 
         bodyMarkup.add(listView);
@@ -108,7 +112,6 @@ public class ContaAdm extends WebPage {
 
     }
 
-    public ContaAdm(PageParameters params) {
-        //TODO:  process page parameters
+    public InicioAdm(PageParameters params) {
     }
 }

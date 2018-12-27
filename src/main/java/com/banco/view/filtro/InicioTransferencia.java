@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.List;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -58,7 +59,7 @@ public final class InicioTransferencia extends WebPage {
 
         if (cpf.length() == 0) {
             refreshLista = new ControllerPessoa().listarTransferencia("");
-            bodyMarkup.add(new AdmHeader("header", true));
+            bodyMarkup.add(new AdmHeader("header", true, true));
         } else {
             refreshLista = new ControllerPessoa().listarTransferencia(cpf);
             bodyMarkup.add(new HeaderUsuario("header", new ControllerPessoa().procurar(cpf).get(0)));

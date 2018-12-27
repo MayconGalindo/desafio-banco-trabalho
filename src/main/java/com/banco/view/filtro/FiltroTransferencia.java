@@ -49,8 +49,13 @@ public class FiltroTransferencia extends Panel {
         
         super(id);
         
-        tipo.add("Transferecia Conta Diferente(Corrente para Corrente)"); tipo.add("Transferecia Conta Diferente(Poupança para Poupança)");
-        tipo.add("Transferecia Mesma Conta(Poupança para Corrente)"); tipo.add("Transferecia Mesma Conta(Corrente para Poupança)");
+        tipo.add("Transferencia Conta Diferente(Corrente para Corrente)"); tipo.add("Transferencia Conta Diferente(Poupança para Poupança)");
+        tipo.add("Transferencia Conta Diferente(Corrente para Poupança)"); tipo.add("Transferencia Conta Diferente(Poupança para Corrente)");
+        
+        tipo.add("Transferencia Ted(Corrente para Corrente)"); tipo.add("Transferencia Ted(Poupança para Poupança)");
+        tipo.add("Transferencia Ted(Corrente para Poupança)"); tipo.add("Transferencia Ted(Poupança para Corrente)");
+        
+        tipo.add("Transferencia Mesma Conta(Poupança para Corrente)"); tipo.add("Transferencia Mesma Conta(Corrente para Poupança)");
         tipo.add("Desposito(Corrente)"); tipo.add("Desposito(Poupança)");
         tipo.add("Saque(Corrente)"); tipo.add("Saque(Poupança)");
         tipo.add("*");

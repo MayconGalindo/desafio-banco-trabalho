@@ -20,21 +20,22 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Contato;
 import com.banco.model.Pessoa;
-import com.banco.view.InicioUsuario;
-import com.googlecode.wicket.jquery.ui.widget.dialog.MessageDialog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.NumberTextField;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -53,7 +54,8 @@ public final class Acao extends Panel {
     WebMarkupContainer markup;
     FeedbackPanel feedback;
     Form form;
-    
+    ModalWindow aviso;
+
     Label lblTed;
     Label lblBanco;
     Label lblAgencia;
@@ -64,8 +66,6 @@ public final class Acao extends Panel {
     AutoCompleteTextField<Integer> agencia;
     AutoCompleteTextField<Integer> contaTransf;
     NumberTextField inp;
-
-    MessageDialog aviso;
     AjaxButton submit;
 
     List<Contato> contatos;
@@ -84,25 +84,31 @@ public final class Acao extends Panel {
      * @param id
      * @param sessao
      * @param funcao
-     * @param corOuPop true = Corrente, false = Poupança
+     * @param tipo
      * @param conta
      */
-    public Acao(String id, Pessoa sessao, String funcao, boolean corOuPop, int conta) {
+    public Acao(String id, Pessoa sessao, String funcao, String tipo, int conta) {
 
         super(id);
 
         contatos = new ControllerPessoa().listarContato(sessao.getId());
         valor = new BancoBrasil();
-        
+
         cb = new ControllerBanco();
         cp = new ControllerPessoa();
-        
+
         markup = new WebMarkupContainer("bodyMarkup");
         markup.add(new FeedbackPanel("feedback"));
 
+        aviso = new ModalWindow("aviso") {
+
+        };
+        aviso.setTitle("Aviso");
+        markup.add(aviso);
+
         form = new Form("form", new CompoundPropertyModel<>(valor));
-        
-        lblTed = new Label("lblTed", Model.of("Ted: "));
+
+        lblTed = new Label("lblTed", Model.of("Ted(R$5,00) : "));
         checkBoxTed = new AjaxCheckBox("checkBoxTed", new PropertyModel<Boolean>(this, "ted")) {
 
             @Override
@@ -117,7 +123,7 @@ public final class Acao extends Panel {
 
         };
         checkBoxTed.setOutputMarkupId(true);
-        
+
         lblBanco = new Label("lblBanco", Model.of("Banco: "));
         banco = new NumberTextField("banco", new PropertyModel<>(this, "numeroBanco"));
         banco.setMinimum(1);
@@ -147,7 +153,6 @@ public final class Acao extends Panel {
                         }
                     }
                 }
-
                 return choices.iterator();
             }
 
@@ -177,7 +182,6 @@ public final class Acao extends Panel {
                         }
                     }
                 }
-
                 return choices.iterator();
             }
 
@@ -212,10 +216,10 @@ public final class Acao extends Panel {
         form.add(inp);
         form.add(lblAgencia);
         form.add(agencia);
-        
+
         form.add(lblConta);
         form.add(contaTransf);
-        
+
         submit = new AjaxButton("submit", form) {
 
             @Override
@@ -224,30 +228,37 @@ public final class Acao extends Panel {
                 switch (funcao) {
                     case "Dif":
                         if (ted) {
-                            mensagem = cb.transferirTed(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
-                            System.out.println("Banco: " + numeroBanco);
+                            mensagem = cb.transferirTed(sessao, tipo, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
                         } else {
-                            mensagem = cb.transferirContaDiferente(sessao, corOuPop, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
+                            mensagem = cb.transferirContaDiferente(sessao, tipo, conta, valor.getAgencia(), valor.getConta(), valor.getValorCorrente());
                         }
-                        
                         break;
 
                     case "Mes":
-                        mensagem = cb.transferirMesmaConta(valor.getValorCorrente(), sessao, corOuPop, conta);
+                        mensagem = cb.transferirMesmaConta(valor.getValorCorrente(), sessao, tipo, conta);
                         break;
 
                     case "Dep":
-                        mensagem = cb.depositar(valor.getValorCorrente(), sessao, corOuPop, conta);
+                        mensagem = cb.depositar(valor.getValorCorrente(), sessao, tipo, conta);
                         break;
 
                     case "Saq":
-                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, corOuPop, conta);
+                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, tipo, conta);
                         break;
                 }
+
+                aviso.setContent(new Label(aviso.getContentId(), Model.of(mensagem + ", voltando ao inicio")));
+                aviso.show(target);
                 info(mensagem);
-                pessoa = cp.logar(sessao.getCpf(), sessao.getSenha());
-                page = new InicioUsuario(pessoa);
-                setResponsePage(page);
+
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                    pessoa = cp.logar(sessao.getCpf(), sessao.getSenha());
+                    page = new InicioUsuario(pessoa);
+                    setResponsePage(page);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Acao.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
             @Override
@@ -271,6 +282,7 @@ public final class Acao extends Panel {
             }
         });
 
+        markup.add(aviso);
         markup.add(form);
         add(markup);
 

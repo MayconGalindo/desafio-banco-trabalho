@@ -19,8 +19,8 @@ import java.text.ParseException;
 
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
-import com.banco.view.InicioAdm;
-import com.banco.view.InicioUsuario;
+import com.banco.view.adm.InicioAdm;
+import com.banco.view.usuario.InicioUsuario;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;

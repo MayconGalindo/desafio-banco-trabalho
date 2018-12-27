@@ -17,8 +17,10 @@ package com.banco.view.adm.form;
 
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
+import com.banco.controller.relatorio.Relatorio;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -32,6 +34,8 @@ import org.apache.wicket.markup.html.form.EmailTextField;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
@@ -47,18 +51,21 @@ public class AddEditPessoa extends Panel {
 
     WebMarkupContainer bodyMarkup;
     Form form;
+    Form formUpload;
+
     TextField cpf, cep, uf, agencia, conta;
     PasswordTextField senha;
     Label btnLabel, agenciaLabel, contaLabel;
     AjaxButton submit;
+    private FileUploadField fileUpload;
 
     ControllerPessoa cp;
     Pessoa pessoa;
     BancoBrasil banco;
 
     List<Character> tipo = new ArrayList<>();
-    JavaScriptResourceReference js = new JavaScriptResourceReference(AddEditPessoa.class, "AddEditPessoa.js");
     private String senhaAlterada;
+    JavaScriptResourceReference js = new JavaScriptResourceReference(AddEditPessoa.class, "AddEditPessoa.js");
 
     @Override
     public void renderHead(IHeaderResponse response) {
@@ -98,6 +105,28 @@ public class AddEditPessoa extends Panel {
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
+        formUpload = new Form("formUpload");
+        formUpload.setMultiPart(true);
+        
+        fileUpload = new FileUploadField("fileUpload");
+        formUpload.add(fileUpload);
+        
+        formUpload.add(new AjaxButton("submitFile", formUpload) {
+            @Override
+            protected void onSubmit(AjaxRequestTarget target) {
+                try {
+                    final FileUpload uploadedFile = fileUpload.getFileUpload();
+                    if (uploadedFile != null) {
+                        File file = new File(uploadedFile.getClientFileName());
+                        new Relatorio().inserirPessoaExcel(file);
+                        fecharModal(target);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        });
+        bodyMarkup.add(formUpload);
+
         form = new Form("form", new CompoundPropertyModel<>(pessoa));
 
         cpf = new TextField("cpf");
@@ -125,7 +154,6 @@ public class AddEditPessoa extends Panel {
                         new ControllerPessoa().adicionarOuEditar(pessoa);
                     }
                 }
-
                 fecharModal(target);
             }
 

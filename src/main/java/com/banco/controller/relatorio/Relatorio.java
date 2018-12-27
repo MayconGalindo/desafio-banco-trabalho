@@ -21,6 +21,7 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,9 +30,13 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -41,6 +46,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 /**
@@ -48,6 +54,83 @@ import org.apache.poi.ss.usermodel.Row;
  * @author NOTEDESENVSP1
  */
 public class Relatorio implements Serializable {
+
+    public void inserirPessoaExcel(File file) {
+
+        FileInputStream fis;
+        List<Pessoa> pessoas = new ArrayList();
+        Pessoa pessoa = new Pessoa();
+        try {
+            fis = new FileInputStream(file); // Finds the workbook instance for XLSX file
+            HSSFWorkbook myWorkBook = new HSSFWorkbook(fis); // Return first sheet from the XLSX workbook 
+            HSSFSheet mySheet = myWorkBook.getSheetAt(0); // Get iterator to all the rows in current sheet 
+            Iterator<Row> rowIterator = mySheet.iterator(); // Traversing over each row of XLSX file 
+
+            int linha = 0;
+            while (rowIterator.hasNext()) {
+                int dados = 0;
+                Row row = rowIterator.next(); // For each row, iterate through each columns 
+                Iterator<Cell> cellIterator = row.cellIterator();
+                if (linha > 0) {
+                    while (cellIterator.hasNext()) {
+
+                        Cell cell = cellIterator.next();
+
+                        switch (dados) {
+                            case 0:
+                                pessoa.setId((int) cell.getNumericCellValue());
+                                break;
+                            case 1:
+                                pessoa.setNome(cell.getStringCellValue());
+                                break;
+                            case 2:
+                                pessoa.setCpf(cell.getStringCellValue());
+                                break;
+                            case 3:
+                                pessoa.setEmail(cell.getStringCellValue());
+                                break;
+                            case 4:
+                                pessoa.setTelefone((int) cell.getNumericCellValue());
+                                break;
+                            case 5:
+                                pessoa.setCep(cell.getStringCellValue());
+                                break;
+                            case 6:
+                                pessoa.setEndereco(cell.getStringCellValue());
+                                break;
+                            case 7:
+                                pessoa.setNumero((int) cell.getNumericCellValue());
+                                break;
+                            case 8:
+                                pessoa.setBairro(cell.getStringCellValue());
+                                break;
+                            case 9:
+                                pessoa.setCidade(cell.getStringCellValue());
+                                break;
+                            case 10:
+                                pessoa.setUf(cell.getStringCellValue());
+                                break;
+                            case 11:
+                                pessoa.setTipoConta(cell.getStringCellValue().charAt(0));
+                                break;
+                            case 12:
+                                pessoa.setSenha(cell.getStringCellValue());
+                                break;
+                        }
+                        dados++;
+                    }
+                    pessoas.add(pessoa);
+                }
+                linha++;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Relatorio.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            for (Pessoa p : pessoas) {
+                new ControllerPessoa().adicionarOuEditar(p);
+            }
+        }
+    }
 
     public byte[] gerarExcelPessoa(Integer id) {
 
@@ -64,10 +147,11 @@ public class Relatorio implements Serializable {
             row.createCell(4).setCellValue("Telefone");
             row.createCell(5).setCellValue("Cep");
             row.createCell(6).setCellValue("Endereço");
-            row.createCell(7).setCellValue("Bairro");
-            row.createCell(8).setCellValue("Cidade");
-            row.createCell(9).setCellValue("UF");
-            row.createCell(10).setCellValue("Tipo Conta");
+            row.createCell(7).setCellValue("Rua");
+            row.createCell(8).setCellValue("Bairro");
+            row.createCell(9).setCellValue("Cidade");
+            row.createCell(10).setCellValue("UF");
+            row.createCell(11).setCellValue("Tipo Conta");
 
             Pessoa pessoa = new ControllerPessoa().procurarId(id);
 
@@ -79,11 +163,12 @@ public class Relatorio implements Serializable {
             row.createCell(3).setCellValue(pessoa.getEmail());
             row.createCell(4).setCellValue(pessoa.getTelefone());
             row.createCell(5).setCellValue(pessoa.getCep());
-            row.createCell(6).setCellValue(pessoa.getEndereco() + ", " + pessoa.getNumero());
-            row.createCell(7).setCellValue(pessoa.getBairro());
-            row.createCell(8).setCellValue(pessoa.getCidade());
-            row.createCell(9).setCellValue(pessoa.getUf());
-            row.createCell(10).setCellValue(Character.toString(pessoa.getTipoConta()));
+            row.createCell(6).setCellValue(pessoa.getEndereco());
+            row.createCell(7).setCellValue(pessoa.getNumero());
+            row.createCell(8).setCellValue(pessoa.getBairro());
+            row.createCell(9).setCellValue(pessoa.getCidade());
+            row.createCell(10).setCellValue(pessoa.getUf());
+            row.createCell(11).setCellValue(Character.toString(pessoa.getTipoConta()));
 
             for (int i = 0; i < row.getHeight(); i++) {
                 sheet.autoSizeColumn(i);
@@ -275,13 +360,13 @@ public class Relatorio implements Serializable {
     public byte[] gerarPdfTransferencia(List<Transferencia> transferencias) {
 
         try {
-            
+
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(transferencias);
             Map<String, Object> map = new HashMap();
             map.put("DataSource", dataSource);
 
             String path = "RelatorioPdfTransferencia.jrxml";
-            
+
             InputStream arquivo = Relatorio.class.getResourceAsStream(path);
             JasperReport report = (JasperReport) JasperCompileManager.compileReport(arquivo);
             JasperPrint print = JasperFillManager.fillReport(report, map, dataSource);
