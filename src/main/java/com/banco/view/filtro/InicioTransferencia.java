@@ -17,6 +17,7 @@ package com.banco.view.filtro;
 
 import com.banco.controller.ControllerPessoa;
 import com.banco.controller.relatorio.Relatorio;
+import com.banco.model.Pessoa;
 import com.banco.model.Transferencia;
 import com.banco.view.adm.custom.AdmHeader;
 import com.banco.view.usuario.custom.HeaderUsuario;
@@ -49,6 +50,8 @@ public final class InicioTransferencia extends WebPage {
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
     List<Transferencia> refreshLista;
+    Transferencia transferencia;
+    boolean adm;
 
     public InicioTransferencia(String cpf) throws ParseException {
 
@@ -58,11 +61,16 @@ public final class InicioTransferencia extends WebPage {
         bodyMarkup.setOutputMarkupId(true);
 
         if (cpf.length() == 0) {
+            transferencia = new Transferencia("*", "*", 0.0, "*");
             refreshLista = new ControllerPessoa().listarTransferencia("");
             bodyMarkup.add(new AdmHeader("header", true, true));
+            adm = true;
         } else {
+            Pessoa pessoa = new ControllerPessoa().procurar(cpf).get(0);
+            transferencia = new Transferencia("*", "*", 0.0, "*");
             refreshLista = new ControllerPessoa().listarTransferencia(cpf);
-            bodyMarkup.add(new HeaderUsuario("header", new ControllerPessoa().procurar(cpf).get(0)));
+            bodyMarkup.add(new HeaderUsuario("header", pessoa));
+            adm = false;
         }
 
         IModel lista = new LoadableDetachableModel() {
@@ -77,8 +85,10 @@ public final class InicioTransferencia extends WebPage {
         bodyMarkup.add(new FiltroTransferencia("tableHeader", cpf) {
 
             @Override
-            public void atualizarLista(AjaxRequestTarget target, List<Transferencia> lista) {
-                refreshLista = lista;
+            public void atualizarLista(AjaxRequestTarget target, List<Transferencia> l, Transferencia t, boolean a) {
+                refreshLista = l;
+                transferencia = t;
+                adm = a;
                 target.add(bodyMarkup);
             }
 
@@ -103,14 +113,14 @@ public final class InicioTransferencia extends WebPage {
             @Override
             protected void populateItem(ListItem<Transferencia> item) {
 
-                Transferencia transferencia = item.getModelObject();
+                Transferencia tr = item.getModelObject();
 
-                item.add(new Label("id", transferencia.getId()));
-                item.add(new Label("cpfR", transferencia.getCpfRemetente()));
-                item.add(new Label("cpfD", transferencia.getCpfDestinatario()));
-                item.add(new Label("tipo", transferencia.getTipoTranferencia()));
-                item.add(new Label("valor", transferencia.getValor()));
-                item.add(new Label("data", transferencia.getDataTransf()));
+                item.add(new Label("id", tr.getId()));
+                item.add(new Label("cpfR", tr.getCpfRemetente()));
+                item.add(new Label("cpfD", tr.getCpfDestinatario()));
+                item.add(new Label("tipo", tr.getTipoTranferencia()));
+                item.add(new Label("valor", tr.getValor()));
+                item.add(new Label("data", tr.getDataTransf()));
 
             }
 
@@ -134,7 +144,7 @@ public final class InicioTransferencia extends WebPage {
         String arq;
 
         if (tipo) {
-            bit = new Relatorio().gerarPdfTransferencia(refreshLista);
+            bit = new Relatorio().gerarPdfTransferencia(transferencia, adm);
             arq = "Relatorio Transferencia.pdf";
         } else {
             bit = new Relatorio().gerarExcelTransferencia(refreshLista);

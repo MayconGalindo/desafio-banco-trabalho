@@ -43,10 +43,10 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 
 /**
@@ -59,7 +59,7 @@ public class Relatorio implements Serializable {
 
         FileInputStream fis;
         List<Pessoa> pessoas = new ArrayList();
-        Pessoa pessoa = new Pessoa();
+
         try {
             fis = new FileInputStream(file); // Finds the workbook instance for XLSX file
             HSSFWorkbook myWorkBook = new HSSFWorkbook(fis); // Return first sheet from the XLSX workbook 
@@ -68,23 +68,22 @@ public class Relatorio implements Serializable {
 
             int linha = 0;
             while (rowIterator.hasNext()) {
-                int dados = 0;
+                int dados = 1;
                 Row row = rowIterator.next(); // For each row, iterate through each columns 
                 Iterator<Cell> cellIterator = row.cellIterator();
                 if (linha > 0) {
+                    Pessoa pessoa = new Pessoa();
                     while (cellIterator.hasNext()) {
 
                         Cell cell = cellIterator.next();
+                        DataFormatter formatter = new DataFormatter();
 
                         switch (dados) {
-                            case 0:
-                                pessoa.setId((int) cell.getNumericCellValue());
-                                break;
                             case 1:
                                 pessoa.setNome(cell.getStringCellValue());
                                 break;
                             case 2:
-                                pessoa.setCpf(cell.getStringCellValue());
+                                pessoa.setCpf(formatter.formatCellValue(cell));
                                 break;
                             case 3:
                                 pessoa.setEmail(cell.getStringCellValue());
@@ -93,7 +92,7 @@ public class Relatorio implements Serializable {
                                 pessoa.setTelefone((int) cell.getNumericCellValue());
                                 break;
                             case 5:
-                                pessoa.setCep(cell.getStringCellValue());
+                                pessoa.setCep(formatter.formatCellValue(cell));
                                 break;
                             case 6:
                                 pessoa.setEndereco(cell.getStringCellValue());
@@ -114,7 +113,7 @@ public class Relatorio implements Serializable {
                                 pessoa.setTipoConta(cell.getStringCellValue().charAt(0));
                                 break;
                             case 12:
-                                pessoa.setSenha(cell.getStringCellValue());
+                                pessoa.setSenha(formatter.formatCellValue(cell));
                                 break;
                         }
                         dados++;
@@ -357,19 +356,24 @@ public class Relatorio implements Serializable {
 
     }
 
-    public byte[] gerarPdfTransferencia(List<Transferencia> transferencias) {
+    public byte[] gerarPdfTransferencia(Transferencia transferencia, boolean adm) {
 
         try {
 
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(transferencias);
-            Map<String, Object> map = new HashMap();
-            map.put("DataSource", dataSource);
-
+            Map<String, Object> map = new HashMap<>();
+            map.put("adm", adm);
+            map.put("reme", transferencia.getCpfRemetente());
+            map.put("dest", transferencia.getCpfDestinatario());
+            map.put("tipo", transferencia.getTipoTranferencia());
+            map.put("valor", transferencia.getValor());
+            System.out.println(map.values());
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wicket?zeroDateTimeBehavior=convertToNull", "root", "");
             String path = "RelatorioPdfTransferencia.jrxml";
 
             InputStream arquivo = Relatorio.class.getResourceAsStream(path);
             JasperReport report = (JasperReport) JasperCompileManager.compileReport(arquivo);
-            JasperPrint print = JasperFillManager.fillReport(report, map, dataSource);
+            JasperPrint print = JasperFillManager.fillReport(report, map, con);
 
             String arq = "Relatorio Transferencia.pdf";
             File pdf = new File(arq);
@@ -379,7 +383,7 @@ public class Relatorio implements Serializable {
 
             return Files.readAllBytes(pdf.toPath());
 
-        } catch (JRException | IOException e) {
+        } catch (ClassNotFoundException | SQLException | JRException | IOException e) {
             System.out.println(e);
             return null;
         }

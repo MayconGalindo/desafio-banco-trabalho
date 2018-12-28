@@ -40,7 +40,7 @@ public class FiltroTransferencia extends Panel {
     LoadableDetachableModel listaCpfR;
     LoadableDetachableModel listaCpfD;
     
-    Transferencia transferencia;
+    private Transferencia transferencia;
     List<Double> valor = new ArrayList<>();
     List<String> tipo = new ArrayList<>();
     List<Transferencia> transferencias;
@@ -110,12 +110,15 @@ public class FiltroTransferencia extends Panel {
            
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
+                boolean a;
                 if (cpf.length() == 0) {
+                    a = true;
                     transferencias = new ControllerPessoa().filtrarTransferencia(transferencia);
                 } else {
+                    a = false;
                     transferencias = new ControllerPessoa().filtrarTransferenciaUsuario(transferencia, cpf);
                 }
-                atualizarLista(target, transferencias);
+                atualizarLista(target, transferencias, transferencia, a);
             }
 
             @Override
@@ -129,7 +132,7 @@ public class FiltroTransferencia extends Panel {
         
     }
     
-    public void atualizarLista(AjaxRequestTarget target, List<Transferencia> lista){
+    public void atualizarLista(AjaxRequestTarget target, List<Transferencia> lista, Transferencia transferencia, boolean a){
     }
     
 }

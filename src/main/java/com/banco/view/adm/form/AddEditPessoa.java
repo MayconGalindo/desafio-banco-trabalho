@@ -23,6 +23,8 @@ import com.banco.model.Pessoa;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -107,21 +109,21 @@ public class AddEditPessoa extends Panel {
 
         formUpload = new Form("formUpload");
         formUpload.setMultiPart(true);
-        
+
         fileUpload = new FileUploadField("fileUpload");
         formUpload.add(fileUpload);
-        
+
         formUpload.add(new AjaxButton("submitFile", formUpload) {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
                 try {
                     final FileUpload uploadedFile = fileUpload.getFileUpload();
                     if (uploadedFile != null) {
-                        File file = new File(uploadedFile.getClientFileName());
-                        new Relatorio().inserirPessoaExcel(file);
+                        new Relatorio().inserirPessoaExcel(uploadedFile.writeToTempFile());
                         fecharModal(target);
                     }
-                } catch (NullPointerException e) {
+                } catch (Exception ex) {
+                    Logger.getLogger(AddEditPessoa.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

@@ -23,33 +23,55 @@
 			<pen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<subDataset name="dataset1" uuid="1be77bf7-da4c-4eff-999a-f0196e830ec0"/>
-	<subDataset name="Teste" uuid="3181e685-c734-47c7-8780-d430a32fa2ea">
-		<field name="id" class="java.lang.Integer">
-			<fieldDescription><![CDATA[]]></fieldDescription>
-		</field>
-		<field name="cpfDestinatario" class="java.lang.String">
-			<fieldDescription><![CDATA[]]></fieldDescription>
-		</field>
-		<field name="cpfRemetente" class="java.lang.String">
-			<fieldDescription><![CDATA[]]></fieldDescription>
-		</field>
-		<field name="dataTransf" class="java.lang.String">
-			<fieldDescription><![CDATA[]]></fieldDescription>
-		</field>
-		<field name="tipoTranferencia" class="java.lang.String">
-			<fieldDescription><![CDATA[]]></fieldDescription>
-		</field>
-		<field name="valor" class="java.lang.Double">
-			<fieldDescription><![CDATA[]]></fieldDescription>
-		</field>
-	</subDataset>
-	<parameter name="DataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource" isForPrompting="false">
-		<parameterDescription><![CDATA[]]></parameterDescription>
+	<parameter name="dest" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="reme" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="valor" class="java.lang.Double">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tipo" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="adm" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[select * from transferencia]]>
+		<![CDATA[select * FROM  transferencia
+WHERE 
+IF($P{adm}=true, 
+
+IF($P{dest}='*', cpfDestinatario like '%', cpfDestinatario=$P{dest})
+and
+IF($P{reme}='*', cpfRemetente like '%', cpfRemetente=$P{reme})
+and
+IF($P{tipo}='*', tipoTranferencia like '%', tipoTranferencia=$P{tipo})
+and
+IF($P{valor}=0, valor like '%', valor>=$P{valor}),
+
+"Codigo do usuario");
+]]>
 	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="cpfDestinatario" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="cpfRemetente" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="dataTransf" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tipoTranferencia" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="valor" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -72,112 +94,66 @@
 		<band height="35" splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="61" splitType="Stretch"/>
+		<band height="62" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="42" width="38" height="20" uuid="49a7489d-e713-4c94-876f-8d03a4abf90f"/>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="38" y="42" width="67" height="20" uuid="432279da-92de-4b5a-ac5f-9186abb7a1db"/>
+				<text><![CDATA[Remetente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="42" width="69" height="20" uuid="b3a5f6d0-674e-477d-8788-9a1a6e778c67"/>
+				<text><![CDATA[Destinatario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="174" y="42" width="234" height="20" uuid="c2d6fc1e-e940-4f5e-aee3-0d4345855dd6"/>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="408" y="42" width="47" height="20" uuid="24ad019a-ad53-4932-b0a2-450b2b96b8a5"/>
+				<text><![CDATA[Valor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="42" width="100" height="20" uuid="9a060ca3-ce93-4386-8cfb-bf7a5a93116c"/>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+		</band>
 	</columnHeader>
 	<detail>
-		<band height="147" splitType="Stretch">
-			<componentElement>
-				<reportElement key="table" style="table" x="0" y="0" width="555" height="147" uuid="a2836d00-f2c5-48be-b11c-5cf333aebe61"/>
-				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="Teste" uuid="3cc770cd-32e5-43ba-9d31-ccb5b8b76ec4">
-						<dataSourceExpression><![CDATA[$P{DataSource}]]></dataSourceExpression>
-					</datasetRun>
-					<jr:column width="90" uuid="1000da04-0254-49ad-91e7-e0f2998a6924">
-						<jr:tableHeader style="table_TH" height="60" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="9f8ab893-982a-47e4-bc54-634f980bc19b"/>
-								<text><![CDATA[ID]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:columnHeader style="table_CH" height="60" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="30" uuid="0bcf8ee0-438b-4a9d-ac23-705330146240"/>
-								<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="90" uuid="ac3f1c19-a53e-4aab-8da9-0334be532a48">
-						<jr:tableHeader style="table_TH" height="60" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="bee05a21-a546-44e6-b7de-3433eba37210"/>
-								<text><![CDATA[Remetente]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:columnHeader style="table_CH" height="60" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="30" uuid="2677106a-a7df-4811-a512-3c805f673b53"/>
-								<textFieldExpression><![CDATA[$F{cpfRemetente}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="90" uuid="db6a64cb-e358-4652-ae96-979cfe19f1ec">
-						<jr:tableHeader style="table_TH" height="60" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="5e602916-d312-449d-a08a-ba03635fe0a4"/>
-								<text><![CDATA[Destinatario]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:columnHeader style="table_CH" height="60" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="30" uuid="2c8af82e-d584-4446-bb45-8fd209fe44eb"/>
-								<textFieldExpression><![CDATA[$F{cpfDestinatario}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="90" uuid="3030467f-a5d8-4f1c-96ed-0a8a4ed9efc7">
-						<jr:tableHeader height="60" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="9ee821cf-bd28-4feb-952d-33e07fa05f56"/>
-								<text><![CDATA[Tipo]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:columnHeader height="60" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="30" uuid="f4c4ca7f-db77-4288-9f3f-379ccc9d5828"/>
-								<textFieldExpression><![CDATA[$F{tipoTranferencia}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="90" uuid="5960ca9d-f438-4993-b36e-a726a659b9dd">
-						<jr:tableHeader height="60" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="90" height="30" uuid="c73a79c6-6050-4378-8687-914006878e36"/>
-								<text><![CDATA[Valor]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:columnHeader height="60" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="90" height="30" uuid="146a3854-0dc5-4770-a64f-362c85bd10b5"/>
-								<textFieldExpression><![CDATA[$F{valor}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="103" uuid="dcfa75ca-9e2c-4c5b-83cb-9216bee9a9f0">
-						<jr:tableHeader height="60" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="103" height="30" uuid="98678bf8-d066-4c76-b90c-8a2e6ad47e6b"/>
-								<text><![CDATA[Data]]></text>
-							</staticText>
-						</jr:tableHeader>
-						<jr:columnHeader height="60" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="103" height="30" uuid="84a25799-0012-4465-aff9-3f9dccf7e9bb"/>
-								<textFieldExpression><![CDATA[$F{dataTransf}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
-			</componentElement>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="38" height="20" uuid="917098b0-f8bd-446a-93d8-77ff6d174194"/>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="38" y="0" width="67" height="20" uuid="9ca0f837-6261-4095-b9ad-1c5b423342a0"/>
+				<textFieldExpression><![CDATA[$F{cpfRemetente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="455" y="0" width="100" height="20" uuid="4b326c78-5262-46cd-a18c-a234b7da176b"/>
+				<textFieldExpression><![CDATA[$F{dataTransf}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="174" y="0" width="234" height="20" uuid="4376dc89-7526-4d7c-8a99-9adc3b130764"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tipoTranferencia}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="408" y="1" width="47" height="19" uuid="ba1ecf24-2871-45e8-ad59-7f5c444c7a2b"/>
+				<textFieldExpression><![CDATA[$F{valor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="0" width="69" height="20" uuid="a97a4bb4-c7d8-48ca-b380-a0fdf9527bdd"/>
+				<textFieldExpression><![CDATA[$F{cpfDestinatario}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="32" splitType="Stretch"/>
+		<band height="33" splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
 		<band splitType="Stretch"/>
