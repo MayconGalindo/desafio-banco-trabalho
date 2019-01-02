@@ -19,8 +19,10 @@ import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 
@@ -31,7 +33,8 @@ import org.apache.wicket.model.Model;
 public class Delete extends Panel {
 
     WebMarkupContainer bodyMarkup;
-    AjaxLink link;
+    Form form;
+    AjaxButton submit;
     String label, lblLink;
 
     public Delete(String id, int idAlvo, boolean pessoaOuBanco, boolean desOuExc, boolean ativDesa) {
@@ -58,11 +61,13 @@ public class Delete extends Panel {
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
-        link = new AjaxLink("excluir") {
-
+        form = new Form("form");
+        submit = new AjaxButton("excluir", form) {
+            
             @Override
-            public void onClick(AjaxRequestTarget target) {
-                if (pessoaOuBanco) {
+            protected void onSubmit(AjaxRequestTarget target) {
+                
+                 if (pessoaOuBanco) {
                     new ControllerPessoa().excluir(idAlvo);
                 } else {
                     if (desOuExc) {
@@ -70,17 +75,17 @@ public class Delete extends Panel {
                     } else {
                         new ControllerBanco().excluir(idAlvo);
                     }
-                    
                 }
                 fecharModal(target);
             }
-
         };
-        link.add(new Label("label", Model.of(lblLink)));
+        submit.add(new Label("label", Model.of(lblLink)));
+        
+        form.add(submit);
 
         bodyMarkup.add(new Label("funcLabel", Model.of(label)));
-        bodyMarkup.add(link);
-
+        bodyMarkup.add(form);
+        
         add(bodyMarkup);
     }
 

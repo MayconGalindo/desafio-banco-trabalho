@@ -110,15 +110,15 @@ public class FiltroTransferencia extends Panel {
            
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                boolean a;
+                boolean adm;
                 if (cpf.length() == 0) {
-                    a = true;
+                    adm = true;
                     transferencias = new ControllerPessoa().filtrarTransferencia(transferencia);
                 } else {
-                    a = false;
+                    adm = false;
                     transferencias = new ControllerPessoa().filtrarTransferenciaUsuario(transferencia, cpf);
                 }
-                atualizarLista(target, transferencias, transferencia, a);
+                atualizarLista(target, transferencias, transferencia, adm);
             }
 
             @Override

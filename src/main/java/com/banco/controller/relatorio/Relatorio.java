@@ -48,6 +48,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -57,14 +59,13 @@ public class Relatorio implements Serializable {
 
     public void inserirPessoaExcel(File file) {
 
-        FileInputStream fis;
         List<Pessoa> pessoas = new ArrayList();
 
         try {
-            fis = new FileInputStream(file); // Finds the workbook instance for XLSX file
-            HSSFWorkbook myWorkBook = new HSSFWorkbook(fis); // Return first sheet from the XLSX workbook 
-            HSSFSheet mySheet = myWorkBook.getSheetAt(0); // Get iterator to all the rows in current sheet 
-            Iterator<Row> rowIterator = mySheet.iterator(); // Traversing over each row of XLSX file 
+
+            HSSFWorkbook workBook = new HSSFWorkbook(new FileInputStream(file));
+            HSSFSheet sheet = workBook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
 
             int linha = 0;
             while (rowIterator.hasNext()) {
@@ -356,17 +357,33 @@ public class Relatorio implements Serializable {
 
     }
 
-    public byte[] gerarPdfTransferencia(Transferencia transferencia, boolean adm) {
+    public byte[] gerarPdfTransferencia(Transferencia transferencia, boolean adm, String cpf) {
 
         try {
 
+            String rem = transferencia.getCpfRemetente(), des = transferencia.getCpfDestinatario();
             Map<String, Object> map = new HashMap<>();
+
+            if (adm == false) {
+                if (rem.equals("*") && des.equals("*") || !rem.equals(cpf) && !des.equals(cpf)) {
+                    map.put("nulo", true);
+                    map.put("reme", cpf);
+                    map.put("dest", cpf);
+                } else {
+                    map.put("nulo", false);
+                    map.put("reme", rem);
+                    map.put("dest", des);
+                }
+            } else {
+                map.put("nulo", false);
+                map.put("reme", rem);
+                map.put("dest", des);
+            }
+
             map.put("adm", adm);
-            map.put("reme", transferencia.getCpfRemetente());
-            map.put("dest", transferencia.getCpfDestinatario());
             map.put("tipo", transferencia.getTipoTranferencia());
             map.put("valor", transferencia.getValor());
-            System.out.println(map.values());
+
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wicket?zeroDateTimeBehavior=convertToNull", "root", "");
             String path = "RelatorioPdfTransferencia.jrxml";

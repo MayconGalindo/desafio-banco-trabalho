@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.List;
-import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -49,9 +48,11 @@ public final class InicioTransferencia extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
+    
     List<Transferencia> refreshLista;
     Transferencia transferencia;
     boolean adm;
+    String cpfUser;
 
     public InicioTransferencia(String cpf) throws ParseException {
 
@@ -59,6 +60,7 @@ public final class InicioTransferencia extends WebPage {
         
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);
+        cpfUser = cpf;
 
         if (cpf.length() == 0) {
             transferencia = new Transferencia("*", "*", 0.0, "*");
@@ -144,7 +146,7 @@ public final class InicioTransferencia extends WebPage {
         String arq;
 
         if (tipo) {
-            bit = new Relatorio().gerarPdfTransferencia(transferencia, adm);
+            bit = new Relatorio().gerarPdfTransferencia(transferencia, adm, cpfUser);
             arq = "Relatorio Transferencia.pdf";
         } else {
             bit = new Relatorio().gerarExcelTransferencia(refreshLista);

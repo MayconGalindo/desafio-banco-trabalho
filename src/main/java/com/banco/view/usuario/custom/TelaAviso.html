@@ -3,16 +3,17 @@
 <html xmlns:wicket>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>TelaAviso</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
-        <title>Delete</title>
     </head>
     <body>
         <wicket:panel>
             <div wicket:id="bodyMarkup" class="container">
                 <div class="alert alert-warning">
-                    <strong><label wicket:id="funcLabel"/></strong>
+                    <strong><label wicket:id="mensagem"></label></strong>, deseja sair do seu usuario:
                     <form wicket:id="form">
-                        <input wicket:id="excluir" type="submit" class="btn btn-success"><label wicket:id="label"/></input>
+                        <input wicket:id="inicio" class="btn" data-dismiss="modal" value="Não"></input>
+                        <input type="submit" class="btn btn-success" value="Sim"></input>
                     </form>
                 </div>
             </div>

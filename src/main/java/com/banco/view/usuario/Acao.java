@@ -15,11 +15,13 @@
  */
 package com.banco.view.usuario;
 
+import com.banco.TelaLogin;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Contato;
 import com.banco.model.Pessoa;
+import com.banco.view.usuario.custom.TelaAviso;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -50,7 +52,6 @@ import org.apache.wicket.util.string.Strings;
  */
 public final class Acao extends Panel {
 
-    IRequestablePage page;
     WebMarkupContainer markup;
     FeedbackPanel feedback;
     Form form;
@@ -70,11 +71,8 @@ public final class Acao extends Panel {
 
     List<Contato> contatos;
     ControllerBanco cb;
-    ControllerPessoa cp;
 
     BancoBrasil valor;
-    Pessoa pessoa;
-
     String mensagem;
     int numeroBanco;
     boolean ted = false;
@@ -95,14 +93,11 @@ public final class Acao extends Panel {
         valor = new BancoBrasil();
 
         cb = new ControllerBanco();
-        cp = new ControllerPessoa();
-
+        
         markup = new WebMarkupContainer("bodyMarkup");
         markup.add(new FeedbackPanel("feedback"));
 
-        aviso = new ModalWindow("aviso") {
-
-        };
+        aviso = new ModalWindow("aviso");
         aviso.setTitle("Aviso");
         markup.add(aviso);
 
@@ -247,18 +242,10 @@ public final class Acao extends Panel {
                         break;
                 }
 
-                aviso.setContent(new Label(aviso.getContentId(), Model.of(mensagem + ", voltando ao inicio")));
+                aviso.setContent(new TelaAviso(aviso.getContentId(), sessao, mensagem));
                 aviso.show(target);
                 info(mensagem);
 
-                try {
-                    TimeUnit.SECONDS.sleep(5);
-                    pessoa = cp.logar(sessao.getCpf(), sessao.getSenha());
-                    page = new InicioUsuario(pessoa);
-                    setResponsePage(page);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Acao.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
 
             @Override
