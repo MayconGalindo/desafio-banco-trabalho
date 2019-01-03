@@ -26,8 +26,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.NumberTextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -42,14 +41,8 @@ public class AddEditConta extends Panel {
 
     WebMarkupContainer bodyMarkup;
     Form form;
-    TextField cpf;
-    TextField cep;
-    TextField uf;
-    PasswordTextField senha;
-    Label btnLabel;
     AjaxButton submit;
 
-    ControllerBanco cb;
     Pessoa pessoa;
     BancoBrasil banco;
 
@@ -57,16 +50,13 @@ public class AddEditConta extends Panel {
 
         super(id);
 
-        cb = new ControllerBanco();
-
         pessoa = new Pessoa();
         banco = new BancoBrasil();
-        btnLabel = new Label("btnLabel", Model.of("Adicionar"));
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
         form = new Form("form", new CompoundPropertyModel<>(banco));
-
+                
         submit = new AjaxButton("submit", form) {
 
             @Override
@@ -80,8 +70,6 @@ public class AddEditConta extends Panel {
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                super.onError(target); //To change body of generated methods, choose Tools | Templates.
-                System.out.println("Erro Conta");
             }
 
         };
@@ -89,11 +77,17 @@ public class AddEditConta extends Panel {
         form.add(new DropDownChoice("cpf", new PropertyModel<Pessoa>(pessoa, "cpf"), new LoadableDetachableModel<List<String>>() {
             @Override
             protected List<String> load() {
-                return new ControllerPessoa().listarCpf();
+                List<String> list = new ControllerPessoa().listarCpf();
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).length() < 10) {
+                        list.remove(i);
+                    }
+                }
+                return list;
             }
         }));
-        form.add(new TextField("agencia"));
-        form.add(new TextField("conta"));
+        form.add(new NumberTextField("agencia"));
+        form.add(new NumberTextField("conta"));
         form.add(submit);
 
         bodyMarkup.add(form);

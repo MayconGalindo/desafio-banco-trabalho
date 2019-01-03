@@ -8,15 +8,27 @@
     </head>
     <body>
         <wicket:panel>
-            <div wicket:id="bodyMarkup" class="container row">
+            <div wicket:id="bodyMarkup" class="container">
                 <form wicket:id="form" class="form-inline">
-                    <div class="form-group">
-                        <select wicket:id="cpfRemetente"/>
-                        <select wicket:id="cpfDestinatario"/>
-                        <select wicket:id="tipoTranferencia"/>
-                        <select wicket:id="valor"/>
+                    <div class="form-row">
+                        <div class="form-group space">
+                            <label class="space">Remet.:</label>
+                            <select wicket:id="cpfRemetente" class="form-control"/>
+                        </div>
+                        <div class="form-group space">
+                            <label class="space">Dest.:</label>
+                            <select wicket:id="cpfDestinatario" class="form-control"/>
+                        </div>
+                        <div class="form-group space">
+                            <label class="space">Tipo:</label>
+                            <select wicket:id="tipoTranferencia" class="form-control"/>
+                        </div>
+                        <div class="form-group space">
+                            <label class="space">Valor:(>)</label>
+                            <select wicket:id="valor" class="form-control"/>
+                        </div>
                     </div>
-                    <button wicket:id="submit" class="btn btn-primary" type="submit">Filtrar</button>
+                    <button wicket:id="submit" class="btn btn-primary space-left" type="submit">Filtrar</button>
                 </form>
             </div>
         </wicket:panel>

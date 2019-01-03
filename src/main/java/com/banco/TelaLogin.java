@@ -32,6 +32,9 @@ import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.request.component.IRequestablePage;
+import org.apache.wicket.request.resource.CssResourceReference;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 
 /**
  *
@@ -42,6 +45,13 @@ public final class TelaLogin extends WebPage {
     Pessoa pessoa;
     IRequestablePage page;
     PasswordTextField senha;
+
+    CssResourceReference css = new CssResourceReference(TelaLogin.class, "LoginStyle.css");
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        response.render(CssReferenceHeaderItem.forReference(css));
+    }
 
     public TelaLogin() {
 

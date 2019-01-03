@@ -41,7 +41,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.component.IRequestablePage;
-
+import org.apache.wicket.request.resource.CssResourceReference;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import java.text.ParseException;
 import java.util.List;
 
@@ -65,6 +67,13 @@ public class AdmHeader extends Panel {
     BancoBrasil banco;
     String titulo;
     List searchList;
+	
+	CssResourceReference css = new CssResourceReference(AdmHeader.class, "Style.css");
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        response.render(CssReferenceHeaderItem.forReference(css));
+    }
 
     public AdmHeader(String id, boolean pagina, boolean remover) throws ParseException {
 

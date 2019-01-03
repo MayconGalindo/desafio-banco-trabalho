@@ -22,12 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.request.resource.CssResourceReference;
 
 /**
  *
@@ -44,6 +47,13 @@ public class FiltroTransferencia extends Panel {
     List<Double> valor = new ArrayList<>();
     List<String> tipo = new ArrayList<>();
     List<Transferencia> transferencias;
+    
+    CssResourceReference css = new CssResourceReference(FiltroTransferencia.class, "Style.css");
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        response.render(CssReferenceHeaderItem.forReference(css));
+    }
 
     public FiltroTransferencia(String id, String cpf) throws ParseException {
         

@@ -18,7 +18,6 @@ package com.banco.view.adm.form;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -62,7 +61,7 @@ public class Delete extends Panel {
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
         form = new Form("form");
-        submit = new AjaxButton("excluir", form) {
+        submit = new AjaxButton("excluir", Model.of(lblLink), form) {
             
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
@@ -79,7 +78,6 @@ public class Delete extends Panel {
                 fecharModal(target);
             }
         };
-        submit.add(new Label("label", Model.of(lblLink)));
         
         form.add(submit);
 

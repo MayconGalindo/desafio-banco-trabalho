@@ -15,16 +15,17 @@
  */
 package com.banco.view.usuario;
 
-import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import com.banco.view.usuario.FuncoesUsuario;
 import com.banco.view.usuario.custom.HeaderUsuario;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.component.IRequestablePage;
+import org.apache.wicket.request.resource.CssResourceReference;
 
 /**
  *
@@ -32,10 +33,15 @@ import org.apache.wicket.request.component.IRequestablePage;
  */
 public final class InicioUsuario extends WebPage {
 
-    Pessoa pessoa;
-    BancoBrasil banco;
     WebMarkupContainer markBody;
     IRequestablePage page;
+    
+    CssResourceReference css = new CssResourceReference(InicioUsuario.class, "Style.css");
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        response.render(CssReferenceHeaderItem.forReference(css));
+    }
 
     public InicioUsuario(Pessoa pessoa) {
 
@@ -90,6 +96,5 @@ public final class InicioUsuario extends WebPage {
     }
 
     public InicioUsuario(PageParameters params) {
-
     }
 }

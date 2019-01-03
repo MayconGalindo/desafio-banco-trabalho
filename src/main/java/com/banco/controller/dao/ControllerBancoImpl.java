@@ -188,7 +188,8 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                             if (saldo >= 0 && valor > 0) {
                                 banco.setValorCorrente(saldo);
                                 contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
-                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Corrente para Corrente)", valor, contaAlvo.getPessoa().getCpf());
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Corrente para Corrente)", 
+                                        valor, contaAlvo.getPessoa().getCpf());
                             } else {
                                 return "Não é possivel transferir esse valor";
                             }
@@ -199,7 +200,8 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                             if (saldo >= 0 && valor > 0) {
                                 banco.setValorPoupanca(saldo);
                                 contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
-                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Poupança para Poupança)", valor, contaAlvo.getPessoa().getCpf());
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Poupança para Poupança)", 
+                                        valor, contaAlvo.getPessoa().getCpf());
                             } else {
                                 return "Não é possivel transferir esse valor";
                             }
@@ -210,7 +212,8 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                             if (saldo >= 0 && valor > 0) {
                                 banco.setValorCorrente(saldo);
                                 contaAlvo.setValorPoupanca(contaAlvo.getValorPoupanca() + valor);
-                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Corrente para Poupança)", valor, contaAlvo.getPessoa().getCpf());
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Corrente para Poupança)", 
+                                        valor, contaAlvo.getPessoa().getCpf());
                             } else {
                                 return "Não é possivel transferir esse valor";
                             }
@@ -221,7 +224,8 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                             if (saldo >= 0 && valor > 0) {
                                 banco.setValorPoupanca(saldo);
                                 contaAlvo.setValorCorrente(contaAlvo.getValorCorrente() + valor);
-                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Poupança para Corrente)", valor, contaAlvo.getPessoa().getCpf());
+                                transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Conta Diferente(Poupança para Corrente)", 
+                                        valor, contaAlvo.getPessoa().getCpf());
                             } else {
                                 return "Não é possivel transferir esse valor";
                             }
@@ -302,7 +306,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                     saldo = banco.getValorPoupanca() - (valor + 5);
                     if (saldo >= 0 && valor > 0) {
                         banco.setValorPoupanca(saldo);
-                        transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Ted(Poupança para Poupança)", valor, Integer.toString(conta));
+                        transferencia = new Transferencia(pessoa.getCpf(), "Transferencia Ted(Poupança para Corrente)", valor, Integer.toString(conta));
                     } else {
                         return "Não é possivel transferir esse valor";
                     }
@@ -464,7 +468,6 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             return "Valor saquado";
 
         } catch (HibernateException | ParseException e) {
-            System.out.println(e);
             return e.toString();
         } finally {
             closeSession();

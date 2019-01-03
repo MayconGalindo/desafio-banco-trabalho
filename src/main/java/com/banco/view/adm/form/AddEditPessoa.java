@@ -20,7 +20,6 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.controller.relatorio.Relatorio;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,6 +33,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.EmailTextField;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.NumberTextField;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -55,7 +55,8 @@ public class AddEditPessoa extends Panel {
     Form form;
     Form formUpload;
 
-    TextField cpf, cep, uf, agencia, conta;
+    TextField cpf, cep, uf;
+    NumberTextField agencia, conta;
     PasswordTextField senha;
     Label btnLabel, agenciaLabel, contaLabel;
     AjaxButton submit;
@@ -86,10 +87,10 @@ public class AddEditPessoa extends Panel {
 
         cp = new ControllerPessoa();
         senha = new PasswordTextField("senha");
-        agenciaLabel = new Label("agenciaLabel", Model.of("Agencia: "));
-        agencia = new TextField("agencia", new PropertyModel(banco, "agencia"));
-        contaLabel = new Label("contaLabel", Model.of("Conta: "));
-        conta = new TextField("conta", new PropertyModel(banco, "conta"));
+        agenciaLabel = new Label("agenciaLabel", Model.of("Agencia"));
+        agencia = new NumberTextField("agencia", new PropertyModel(banco, "agencia"));
+        contaLabel = new Label("contaLabel", Model.of("Conta"));
+        conta = new NumberTextField("conta", new PropertyModel(banco, "conta"));
 
         if (idPessoa == null) {
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
@@ -172,12 +173,12 @@ public class AddEditPessoa extends Panel {
         form.add(cpf);
         form.add(cep);
         form.add(new TextField("endereco"));
-        form.add(new TextField("numero"));
+        form.add(new NumberTextField("numero"));
         form.add(new TextField("bairro"));
         form.add(new TextField("cidade"));
         form.add(uf);
         form.add(new EmailTextField("email"));
-        form.add(new TextField("telefone"));
+        form.add(new NumberTextField("telefone"));
         form.add(new DropDownChoice("tipoConta", tipo));
         form.add(senha);
 

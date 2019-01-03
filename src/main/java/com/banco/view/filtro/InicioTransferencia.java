@@ -27,6 +27,8 @@ import java.text.ParseException;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
@@ -38,6 +40,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.util.resource.AbstractResourceStreamWriter;
 
 /**
@@ -53,6 +56,13 @@ public final class InicioTransferencia extends WebPage {
     Transferencia transferencia;
     boolean adm;
     String cpfUser;
+    
+    CssResourceReference css = new CssResourceReference(InicioTransferencia.class, "Style.css");
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        response.render(CssReferenceHeaderItem.forReference(css));
+    }
 
     public InicioTransferencia(String cpf) throws ParseException {
 

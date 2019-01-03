@@ -20,10 +20,13 @@ import com.banco.view.usuario.custom.HeaderUsuario;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.request.resource.CssResourceReference;
 
 /**
  *
@@ -33,12 +36,15 @@ public final class FuncoesUsuario extends WebPage {
 
     WebMarkupContainer markBody;
     ModalWindow list;
-    String lblCorrente;
-    String lblPoupanca;
-    AjaxLink corrente;
-    AjaxLink poupanca;
-    AjaxLink corrente_poupanca;
-    AjaxLink poupanca_corrente;
+    AjaxLink corrente, poupanca, corrente_poupanca, poupanca_corrente;
+
+    String lblCorrente, lblPoupanca;
+    CssResourceReference css = new CssResourceReference(FuncoesUsuario.class, "Style.css");
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        response.render(CssReferenceHeaderItem.forReference(css));
+    }
 
     public FuncoesUsuario(Pessoa pessoa, String funcao) {
 
@@ -117,6 +123,5 @@ public final class FuncoesUsuario extends WebPage {
     }
 
     public FuncoesUsuario(PageParameters params) {
-        //TODO:  process page parameters
     }
 }
