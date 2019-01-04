@@ -57,6 +57,7 @@ public final class TelaAviso extends Panel {
 
             @Override
             protected void onSubmit() {
+                getSession().invalidate();
                 page = new TelaLogin();
                 setResponsePage(page);
             }

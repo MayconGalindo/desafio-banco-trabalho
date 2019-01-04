@@ -22,8 +22,6 @@ import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -80,7 +78,7 @@ public class AddEditPessoa extends Panel {
     public AddEditPessoa(String id, Integer idPessoa) {
 
         super(id);
-        
+
         gerarCampos();
 
         tipo.add('U');
@@ -100,19 +98,14 @@ public class AddEditPessoa extends Panel {
             agencia.setVisible(false);
             contaLabel.setVisible(false);
             conta.setVisible(false);
+            formUpload.setVisible(false);
         }
 
-        
         bodyMarkup.add(feedbackPanel);
 
-        formUpload = new Form("formUpload");
-        formUpload.setMultiPart(true);
-
-        fileUpload = new FileUploadField("fileUpload");
         formUpload.add(fileUpload);
-
         formUpload.add(new AjaxButton("submitFile", formUpload) {
-            
+
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
                 try {
@@ -130,7 +123,7 @@ public class AddEditPessoa extends Panel {
                     target.add(feedbackPanel);
                 }
             }
-            
+
         });
         bodyMarkup.add(formUpload);
 
@@ -194,27 +187,33 @@ public class AddEditPessoa extends Panel {
     }
 
     public void gerarCampos() {
-        
+
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
         feedbackPanel = new FeedbackPanel("feedback");
         feedbackPanel.setOutputMarkupId(true);
+        
+        formUpload = new Form("formUpload");
+        formUpload.setOutputMarkupId(true);
+        formUpload.setMultiPart(true);
+
+        fileUpload = new FileUploadField("fileUpload");
 
         nome = new TextField("nome");
         nome.setRequired(true);
-        
+
         endereco = new TextField("endereco");
         endereco.setRequired(true);
-        
+
         bairro = new TextField("bairro");
         bairro.setRequired(true);
-        
+
         email = new EmailTextField("email");
         email.setRequired(true);
-        
+
         cidade = new TextField("cidade");
         cidade.setRequired(true);
-        
+
         cpf = new TextField("cpf");
         cpf.add(StringValidator.maximumLength(11));
         cpf.setRequired(true);
@@ -226,10 +225,10 @@ public class AddEditPessoa extends Panel {
         uf = new TextField("uf");
         uf.add(StringValidator.maximumLength(2));
         uf.setRequired(true);
-        
+
         agenciaLabel = new Label("agenciaLabel", Model.of("Agencia"));
         agencia = new NumberTextField("agencia", new PropertyModel(banco, "agencia"));
-        
+
         contaLabel = new Label("contaLabel", Model.of("Conta"));
         conta = new NumberTextField("conta", new PropertyModel(banco, "conta"));
 

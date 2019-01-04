@@ -51,7 +51,7 @@ public class FuncoesAdm extends Panel {
         response.render(CssReferenceHeaderItem.forReference(cssGlyp));
     }
     
-    public FuncoesAdm(String id, Integer idPessoa, boolean pessoaOuBanco, boolean atvOuDtv) {
+    public FuncoesAdm(String id, Integer idPessoa, boolean pessoaOuBanco, boolean atvOuDtv, String nome) {
 
         super(id);
 
@@ -62,7 +62,7 @@ public class FuncoesAdm extends Panel {
         modalDel.setOutputMarkupId(true);
         modalDel.setResizable(false);
         modalDel.setTitle("Excluir");
-        modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, false, atvOuDtv) {
+        modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, false, atvOuDtv, nome) {
 
             @Override
             public void fecharModal(AjaxRequestTarget target) {
@@ -99,7 +99,7 @@ public class FuncoesAdm extends Panel {
 
         } else {
 
-            modalEdit.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, true, atvOuDtv) {
+            modalEdit.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, true, atvOuDtv, nome) {
 
                 @Override
                 public void fecharModal(AjaxRequestTarget target) {

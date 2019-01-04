@@ -36,24 +36,24 @@ public class Delete extends Panel {
     AjaxButton submit;
     String label, lblLink;
 
-    public Delete(String id, int idAlvo, boolean pessoaOuBanco, boolean desOuExc, boolean ativDesa) {
+    public Delete(String id, int idAlvo, boolean pessoaOuBanco, boolean desOuExc, boolean ativDesa, String nome) {
 
         super(id);
 
         if (pessoaOuBanco) {
-            label = "Deseja excluir a pessoa: " + idAlvo;
+            label = "Deseja excluir: " + nome;
             lblLink = "Excluir";
         } else {
             if (desOuExc) {
                 if (ativDesa) {
-                    label = "Deseja desativar a conta: " + idAlvo;
+                    label = "Deseja desativar a conta: " + nome;
                     lblLink = "Desativar";
                 } else {
-                    label = "Deseja Ativar a conta: " + idAlvo;
+                    label = "Deseja ativar a conta: " + nome;
                     lblLink = "Ativar";
                 }
             } else {
-                label = "Deseja excluir a conta: " + idAlvo;
+                label = "Deseja excluir a conta: " + nome;
                 lblLink = "Excluir";
             }
         }

@@ -89,9 +89,9 @@ public final class HeaderUsuario extends Panel {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
+                getSession().invalidate();
                 page = new TelaLogin();
                 setResponsePage(page);
-                Session.get().invalidateNow();
             }
 
         });

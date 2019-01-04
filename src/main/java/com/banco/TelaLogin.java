@@ -77,7 +77,7 @@ public final class TelaLogin extends WebPage {
             protected void onSubmit(AjaxRequestTarget target) {
 
                 ControllerPessoa cp = new ControllerPessoa();
-                if (cp.validarLogin(pessoa.getCpf(), pessoa.getSenha())) {
+                if (AutenticarLogin.get().signIn(pessoa.getCpf(), pessoa.getSenha())) {
 
                     pessoa = new ControllerPessoa().logar(pessoa.getCpf(), pessoa.getSenha());
 
@@ -87,14 +87,13 @@ public final class TelaLogin extends WebPage {
                         try {
                             page = new InicioAdm();
                         } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-                            break;
+                            System.out.print(e);
+                        }
+                        break;
 
-                        case 'U':
-                            page = new InicioUsuario(pessoa);
-                            break;
+                    case 'U':
+                        page = new InicioUsuario(pessoa);
+                        break;
                     }
                     setResponsePage(page);
 
@@ -119,6 +118,6 @@ public final class TelaLogin extends WebPage {
     }
 
     public TelaLogin(PageParameters params) {
-        //TODO:  process page parameters
+        // TODO: process page parameters
     }
 }

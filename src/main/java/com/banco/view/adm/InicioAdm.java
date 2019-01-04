@@ -15,6 +15,7 @@
  */
 package com.banco.view.adm;
 
+import com.banco.TelaLogin;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
@@ -42,6 +43,15 @@ public final class InicioAdm extends WebPage {
     PageableListView listView;
     List<Pessoa> refreshLista = new ControllerPessoa().listar();
 
+    @Override
+    protected void onConfigure() {
+        super.onConfigure();
+        if (getSession().isSessionInvalidated()) {
+            setResponsePage(TelaLogin.class);
+        }
+        
+    }
+    
     public InicioAdm() throws ParseException{
 
         super();
@@ -89,7 +99,7 @@ public final class InicioAdm extends WebPage {
                 item.add(new Label("email", pessoa.getEmail()));
                 item.add(new Label("tipoConta", pessoa.getTipoConta()));
                 item.add(new Label("contas", new ControllerBanco().contasPessoa(pessoa.getId()).size()));
-                item.add(new FuncoesAdm("funcoes", pessoa.getId(), true, true) {
+                item.add(new FuncoesAdm("funcoes", pessoa.getId(), true, true, pessoa.getNome()) {
 
                     @Override
                     public void atualizarLista(AjaxRequestTarget target) {
