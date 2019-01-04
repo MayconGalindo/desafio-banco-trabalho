@@ -60,9 +60,11 @@ public final class TelaLogin extends WebPage {
         pessoa = new Pessoa();
         WebMarkupContainer markup = new WebMarkupContainer("bodyMarkup");
         FeedbackPanel feedbackPanel = new FeedbackPanel("feedback");
+        feedbackPanel.setOutputMarkupId(true);
         Form form = new Form("form", new CompoundPropertyModel(pessoa));
 
         senha = new PasswordTextField("senha");
+        senha.setRequired(true);
         senha.setOutputMarkupId(true);
         senha.setResetPassword(true);
 
@@ -98,13 +100,14 @@ public final class TelaLogin extends WebPage {
 
                 } else {
                     info("Usuario e/ou senha errada");
+                    target.add(feedbackPanel);
                 }
 
             }
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                super.onError(target); //To change body of generated methods, choose Tools | Templates.
+                target.add(feedbackPanel);
             }
 
         });

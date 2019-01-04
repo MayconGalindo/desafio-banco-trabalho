@@ -19,7 +19,6 @@ import com.banco.controller.ControllerBanco;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import com.banco.view.usuario.custom.LinkSelecionar;
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.navigation.paging.AjaxPagingNavigator;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;

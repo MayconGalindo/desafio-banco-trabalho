@@ -41,14 +41,16 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
     Pessoa pessoa;
 
     @Override
-    public void adicionarOuEditar(Pessoa pessoa) {
+    public Boolean adicionarOuEditar(Pessoa pessoa) {
 
         try {
             session.beginTransaction();
             session.saveOrUpdate(pessoa);
             session.getTransaction().commit();
+            return true;
         } catch (HibernateException e) {
             System.out.println(e);
+            return false;
         } finally {
             closeSession();
         }

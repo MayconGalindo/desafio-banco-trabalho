@@ -238,7 +238,7 @@ public final class Acao extends Panel {
                         break;
 
                     case "Saq":
-                        mensagem = cb.saquar(valor.getValorCorrente(), sessao, tipo, conta);
+                        mensagem = cb.sacar(valor.getValorCorrente(), sessao, tipo, conta);
                         break;
                 }
 

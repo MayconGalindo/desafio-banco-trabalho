@@ -41,14 +41,16 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
     double saldo;
 
     @Override
-    public void adicionarOuEditar(BancoBrasil banco) {
+    public Boolean adicionarOuEditar(BancoBrasil banco) {
 
         try {
             session.beginTransaction();
             session.saveOrUpdate(banco);
             session.getTransaction().commit();
+            return true;
         } catch (HibernateException e) {
             System.out.println(e);
+            return false;
         } finally {
             closeSession();
         }
@@ -436,7 +438,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
      * @param conta
      * @return
      */
-    public String saquar(final double valor, Pessoa pessoa, String acao, int conta) {
+    public String sacar(final double valor, Pessoa pessoa, String acao, int conta) {
 
         try {
 
@@ -449,7 +451,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                     banco.setValorCorrente(saldo);
                     transferencia = new Transferencia(pessoa.getCpf(), "Saque(Corrente)", valor, pessoa.getCpf());
                 } else {
-                    return "Não é possivel saquar esse valor";
+                    return "Não é possivel sacar esse valor";
                 }
 
             } else {
@@ -458,7 +460,7 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
                     banco.setValorPoupanca(saldo);
                     transferencia = new Transferencia(pessoa.getCpf(), "Saque(Poupanca)", valor, pessoa.getCpf());
                 } else {
-                    return "Não é possivel saquar esse valor";
+                    return "Não é possivel sacar esse valor";
                 }
             }
 

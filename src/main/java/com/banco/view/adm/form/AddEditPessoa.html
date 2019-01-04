@@ -18,75 +18,81 @@
                     </div>
                     <button wicket:id="submitFile" class="btn btn-primary" type="submit"><label>Inserir</label></button>
                 </form>
+                <hr/>
+                <div wicket:id="feedback"/>
                 <form wicket:id="form">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label>Nome</label>
-                            <input wicket:id="nome" type="text" class="form-control"placeholder="Nome" required/>
+                            <label>Nome *</label>
+                            <input wicket:id="nome" type="text" class="form-control" placeholder="Nome"/>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>CPF</label>
-                            <input wicket:id="cpf" type="text" class="form-control" placeholder="CPF" required/>
+                            <label>CPF *</label>
+                            <input wicket:id="cpf" type="text" class="form-control" placeholder="CPF"/>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label>Email</label>
-                            <input wicket:id="email" type="email" class="form-control" placeholder="Email" required/>
+                            <label>Email *</label>
+                            <input wicket:id="email" type="email" class="form-control" placeholder="Email"/>
                         </div>
                         <div class="form-group col-md-4">
                             <label>Telefone</label>
                             <input wicket:id="telefone" type="number" class="form-control" placeholder="Telefone"/>
                         </div>
                     </div>
+                    <hr/>
                     <div class="form-row">
                         <div class="form-group col-md-3">
-                            <label>Cep</label>
-                            <input wicket:id="cep" id="cep" type="text" class="form-control" placeholder="Cep" required/>
+                            <label>Cep *</label>
+                            <input wicket:id="cep" id="cep" type="text" class="form-control" placeholder="Cep"/>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Cidade</label>
-                            <input wicket:id="cidade" id="cidade" type="text" class="form-control" placeholder="Cidade" required/>
+                            <label>Cidade *</label>
+                            <input wicket:id="cidade" id="cidade" type="text" class="form-control" placeholder="Cidade"/>
                         </div>
                         <div class="form-group col-md-2">
-                            <label>UF</label>
-                            <input wicket:id="uf" id="uf" type="text" class="form-control" placeholder="UF" required/>
+                            <label>UF *</label>
+                            <input wicket:id="uf" id="uf" type="text" class="form-control" placeholder="UF"/>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label>Endereço</label>
-                            <input wicket:id="endereco" id="endereco" type="text" class="form-control" placeholder="Endereço" required/>
+                            <label>Endereço *</label>
+                            <input wicket:id="endereco" id="endereco" type="text" class="form-control" placeholder="Endereço"/>
                         </div>
                         <div class="form-group col-md-3">
-                            <label>Rua</label>
-                            <input wicket:id="numero" type="number" class="form-control" placeholder="Rua" required/>
+                            <label>Rua *</label>
+                            <input wicket:id="numero" type="number" class="form-control" placeholder="Rua"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Bairro</label>
-                        <input wicket:id="bairro" id="bairro" type="text" class="form-control" placeholder="Bairro" required/>
+                        <label>Bairro *</label>
+                        <input wicket:id="bairro" id="bairro" type="text" class="form-control" placeholder="Bairro"/>
                     </div>
+                    <hr/>
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label wicket:id="agenciaLabel"/>
-                            <input wicket:id="agencia" type="number" class="form-control" placeholder="Agencia" required/>
+                            <input wicket:id="agencia" type="number" class="form-control" placeholder="Agencia"/>
                         </div>
                         <div class="form-group col-md-6">
                             <label wicket:id="contaLabel"/>
-                            <input wicket:id="conta" type="number" class="form-control" placeholder="Conta" required/>
+                            <input wicket:id="conta" type="number" class="form-control" placeholder="Conta"/>
                         </div>
                     </div>
+                    <hr/>
                     <div class="form-row">
-                        <div class="form-group col-md-2">
-                            <label>Tipo</label>
-                            <select wicket:id="tipoConta" type="text" class="form-control" placeholder="Tipo de Conta" required/>
+                        <div class="form-group col-md-3">
+                            <label>Tipo *</label>
+                            <select wicket:id="tipoConta" type="text" class="form-control" placeholder="Tipo de Conta"/>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Senha</label>
+                            <label>Senha *</label>
                             <input wicket:id="senha" type="password" class="form-control" placeholder="Senha"/>
                         </div>
                     </div>
+                    <hr/>
                     <button wicket:id="submit" class="btn btn-primary" type="submit"><label wicket:id="btnLabel"/></button>
                 </form>
             </div>

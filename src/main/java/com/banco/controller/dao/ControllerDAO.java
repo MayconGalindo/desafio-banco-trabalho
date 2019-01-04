@@ -16,6 +16,7 @@
 package com.banco.controller.dao;
 
 import java.util.List;
+import org.apache.poi.ss.formula.functions.T;
 
 /**
  *
@@ -24,7 +25,7 @@ import java.util.List;
  */
 public interface ControllerDAO<T>{
 
-    public void adicionarOuEditar(T cl);
+    public Boolean adicionarOuEditar(T cl);
 
     public void excluir(int id);
 

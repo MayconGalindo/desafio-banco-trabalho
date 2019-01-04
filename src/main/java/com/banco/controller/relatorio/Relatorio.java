@@ -48,8 +48,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -57,7 +55,7 @@ import org.hibernate.criterion.Restrictions;
  */
 public class Relatorio implements Serializable {
 
-    public void inserirPessoaExcel(File file) {
+    public boolean inserirPessoaExcel(File file) {
 
         List<Pessoa> pessoas = new ArrayList();
 
@@ -123,13 +121,16 @@ public class Relatorio implements Serializable {
                 }
                 linha++;
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Relatorio.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
+            
             for (Pessoa p : pessoas) {
                 new ControllerPessoa().adicionarOuEditar(p);
             }
-        }
+            
+            return true;
+            
+        } catch (IOException ex) {
+            return false;
+        } 
     }
 
     public byte[] gerarExcelPessoa(Integer id) {

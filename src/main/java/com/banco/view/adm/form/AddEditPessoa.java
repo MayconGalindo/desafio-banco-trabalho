@@ -38,12 +38,14 @@ import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.validation.validator.StringValidator;
+import org.hibernate.HibernateException;
 
 /**
  *
@@ -52,10 +54,11 @@ import org.apache.wicket.validation.validator.StringValidator;
 public class AddEditPessoa extends Panel {
 
     WebMarkupContainer bodyMarkup;
-    Form form;
-    Form formUpload;
+    Form form, formUpload;
+    FeedbackPanel feedbackPanel;
 
-    TextField cpf, cep, uf;
+    TextField cpf, cep, uf, nome, cidade, bairro, endereco;
+    EmailTextField email;
     NumberTextField agencia, conta;
     PasswordTextField senha;
     Label btnLabel, agenciaLabel, contaLabel;
@@ -67,7 +70,6 @@ public class AddEditPessoa extends Panel {
     BancoBrasil banco;
 
     List<Character> tipo = new ArrayList<>();
-    private String senhaAlterada;
     JavaScriptResourceReference js = new JavaScriptResourceReference(AddEditPessoa.class, "AddEditPessoa.js");
 
     @Override
@@ -78,6 +80,8 @@ public class AddEditPessoa extends Panel {
     public AddEditPessoa(String id, Integer idPessoa) {
 
         super(id);
+        
+        gerarCampos();
 
         tipo.add('U');
         tipo.add('A');
@@ -86,15 +90,9 @@ public class AddEditPessoa extends Panel {
         banco = new BancoBrasil();
 
         cp = new ControllerPessoa();
-        senha = new PasswordTextField("senha");
-        agenciaLabel = new Label("agenciaLabel", Model.of("Agencia"));
-        agencia = new NumberTextField("agencia", new PropertyModel(banco, "agencia"));
-        contaLabel = new Label("contaLabel", Model.of("Conta"));
-        conta = new NumberTextField("conta", new PropertyModel(banco, "conta"));
 
         if (idPessoa == null) {
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
-            senha.setRequired(true);
         } else {
             pessoa = cp.procurarId(idPessoa);
             btnLabel = new Label("btnLabel", Model.of("Editar"));
@@ -102,11 +100,10 @@ public class AddEditPessoa extends Panel {
             agencia.setVisible(false);
             contaLabel.setVisible(false);
             conta.setVisible(false);
-            senha.setRequired(false);
-            senhaAlterada = pessoa.getSenha();
         }
 
-        bodyMarkup = new WebMarkupContainer("bodyMarkup");
+        
+        bodyMarkup.add(feedbackPanel);
 
         formUpload = new Form("formUpload");
         formUpload.setMultiPart(true);
@@ -115,82 +112,129 @@ public class AddEditPessoa extends Panel {
         formUpload.add(fileUpload);
 
         formUpload.add(new AjaxButton("submitFile", formUpload) {
+            
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
                 try {
                     final FileUpload uploadedFile = fileUpload.getFileUpload();
                     if (uploadedFile != null) {
-                        new Relatorio().inserirPessoaExcel(uploadedFile.writeToTempFile());
-                        fecharModal(target);
+                        if (new Relatorio().inserirPessoaExcel(uploadedFile.writeToTempFile())) {
+                            fecharModal(target);
+                        }
                     }
+                } catch (HibernateException ex) {
+                    info("Usuario(s) já inserido");
+                    target.add(feedbackPanel);
                 } catch (Exception ex) {
-                    Logger.getLogger(AddEditPessoa.class.getName()).log(Level.SEVERE, null, ex);
+                    info("Checar os valores inseridos no arquivo");
+                    target.add(feedbackPanel);
                 }
             }
+            
         });
         bodyMarkup.add(formUpload);
 
         form = new Form("form", new CompoundPropertyModel<>(pessoa));
 
-        cpf = new TextField("cpf");
-        cpf.add(StringValidator.maximumLength(11));
-        cep = new TextField("cep");
-        cep.add(StringValidator.maximumLength(8));
-        uf = new TextField("uf");
-        uf.add(StringValidator.maximumLength(2));
         submit = new AjaxButton("submit", form) {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                if (idPessoa == null) {
-                    new ControllerPessoa().adicionarOuEditar(pessoa);
-                    banco.setPessoa(pessoa);
-                    banco.setEstadoConta(true);
-                    new ControllerBanco().adicionarOuEditar(banco);
-                } else {
-                    try {
-                        if (!pessoa.getSenha().isEmpty()) {
-                            new ControllerPessoa().adicionarOuEditar(pessoa);
+                try {
+                    if (idPessoa == null) {
+                        banco.setPessoa(pessoa);
+                        banco.setEstadoConta(true);
+                        if (new ControllerPessoa().adicionarOuEditar(pessoa) && new ControllerBanco().adicionarOuEditar(banco)) {
+                            fecharModal(target);
+                        } else {
+                            target.add(feedbackPanel);
                         }
-                    } catch (NullPointerException e) {
-                        pessoa.setSenha(senhaAlterada);
-                        new ControllerPessoa().adicionarOuEditar(pessoa);
+                    } else {
+                        if (new ControllerPessoa().adicionarOuEditar(pessoa)) {
+                            fecharModal(target);
+                        } else {
+                            target.add(feedbackPanel);
+                        }
                     }
+                } catch (Exception e) {
+                    info(e);
+                    target.add(feedbackPanel);
                 }
-                fecharModal(target);
             }
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                super.onError(target); //To change body of generated methods, choose Tools | Templates.
-                System.out.println("Erro!");
+                target.add(feedbackPanel);
             }
 
         };
         submit.add(btnLabel);
 
-        form.add(new TextField("nome"));
+        form.add(nome);
         form.add(cpf);
         form.add(cep);
-        form.add(new TextField("endereco"));
+        form.add(cidade);
         form.add(new NumberTextField("numero"));
-        form.add(new TextField("bairro"));
-        form.add(new TextField("cidade"));
+        form.add(email);
+        form.add(endereco);
         form.add(uf);
-        form.add(new EmailTextField("email"));
+        form.add(bairro);
         form.add(new NumberTextField("telefone"));
         form.add(new DropDownChoice("tipoConta", tipo));
-        form.add(senha);
-
         form.add(agenciaLabel);
         form.add(agencia);
         form.add(contaLabel);
         form.add(conta);
-
+        form.add(senha);
         form.add(submit);
 
         bodyMarkup.add(form);
         add(bodyMarkup);
+
+    }
+
+    public void gerarCampos() {
+        
+        bodyMarkup = new WebMarkupContainer("bodyMarkup");
+
+        feedbackPanel = new FeedbackPanel("feedback");
+        feedbackPanel.setOutputMarkupId(true);
+
+        nome = new TextField("nome");
+        nome.setRequired(true);
+        
+        endereco = new TextField("endereco");
+        endereco.setRequired(true);
+        
+        bairro = new TextField("bairro");
+        bairro.setRequired(true);
+        
+        email = new EmailTextField("email");
+        email.setRequired(true);
+        
+        cidade = new TextField("cidade");
+        cidade.setRequired(true);
+        
+        cpf = new TextField("cpf");
+        cpf.add(StringValidator.maximumLength(11));
+        cpf.setRequired(true);
+
+        cep = new TextField("cep");
+        cep.add(StringValidator.maximumLength(8));
+        cep.setRequired(true);
+
+        uf = new TextField("uf");
+        uf.add(StringValidator.maximumLength(2));
+        uf.setRequired(true);
+        
+        agenciaLabel = new Label("agenciaLabel", Model.of("Agencia"));
+        agencia = new NumberTextField("agencia", new PropertyModel(banco, "agencia"));
+        
+        contaLabel = new Label("contaLabel", Model.of("Conta"));
+        conta = new NumberTextField("conta", new PropertyModel(banco, "conta"));
+
+        senha = new PasswordTextField("senha");
+        senha.setRequired(true);
 
     }
 
