@@ -85,6 +85,9 @@ public class AdmHeader extends Panel {
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
         formAdd = new ModalWindow("formAdd");
+        formAdd.setOutputMarkupId(true);
+        formAdd.setInitialHeight(600);
+        formAdd.setInitialWidth(1200);
 
         if (pagina) {
             titulo = "Adicionar Pessoa";

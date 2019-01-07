@@ -20,6 +20,7 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.controller.relatorio.Relatorio;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
+import com.banco.view.adm.custom.ValidatorConta;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -55,9 +56,9 @@ public class AddEditPessoa extends Panel {
     Form form, formUpload;
     FeedbackPanel feedbackPanel;
 
-    TextField cpf, cep, uf, nome, cidade, bairro, endereco;
+    TextField cpf, cep, uf, nome, cidade, bairro, endereco, agencia, conta, telefone;
     EmailTextField email;
-    NumberTextField agencia, conta;
+    NumberTextField<Integer>  rua;
     PasswordTextField senha;
     Label btnLabel, agenciaLabel, contaLabel;
     AjaxButton submit;
@@ -133,6 +134,7 @@ public class AddEditPessoa extends Panel {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
+                
                 try {
                     if (idPessoa == null) {
                         banco.setPessoa(pessoa);
@@ -165,19 +167,19 @@ public class AddEditPessoa extends Panel {
 
         form.add(nome);
         form.add(cpf);
+        form.add(email);
+        form.add(telefone);
         form.add(cep);
         form.add(cidade);
-        form.add(new NumberTextField("numero"));
-        form.add(email);
-        form.add(endereco);
         form.add(uf);
+        form.add(endereco);
+        form.add(rua);
         form.add(bairro);
-        form.add(new NumberTextField("telefone"));
-        form.add(new DropDownChoice("tipoConta", tipo));
         form.add(agenciaLabel);
         form.add(agencia);
         form.add(contaLabel);
         form.add(conta);
+        form.add(new DropDownChoice("tipoConta", tipo));
         form.add(senha);
         form.add(submit);
 
@@ -201,22 +203,29 @@ public class AddEditPessoa extends Panel {
 
         nome = new TextField("nome");
         nome.setRequired(true);
-
-        endereco = new TextField("endereco");
-        endereco.setRequired(true);
-
-        bairro = new TextField("bairro");
-        bairro.setRequired(true);
-
-        email = new EmailTextField("email");
-        email.setRequired(true);
-
-        cidade = new TextField("cidade");
-        cidade.setRequired(true);
-
+        
         cpf = new TextField("cpf");
         cpf.add(StringValidator.maximumLength(11));
         cpf.setRequired(true);
+        
+        telefone = new TextField("telefone");
+        //telefone.add(new ValidatorConta("T"));
+        
+        email = new EmailTextField("email");
+        email.setRequired(true);
+
+        endereco = new TextField("endereco");
+        endereco.setRequired(true);
+        
+        rua = new NumberTextField("rua", new PropertyModel(pessoa, "numero"));
+        rua.setMinimum(1);
+        rua.setRequired(true);
+        
+        bairro = new TextField("bairro");
+        bairro.setRequired(true);
+
+        cidade = new TextField("cidade");
+        cidade.setRequired(true);
 
         cep = new TextField("cep");
         cep.add(StringValidator.maximumLength(8));
@@ -227,11 +236,13 @@ public class AddEditPessoa extends Panel {
         uf.setRequired(true);
 
         agenciaLabel = new Label("agenciaLabel", Model.of("Agencia"));
-        agencia = new NumberTextField("agencia", new PropertyModel(banco, "agencia"));
+        agencia = new TextField("agencia", new PropertyModel(banco, "agencia"));
+        agencia.add(new ValidatorConta("A"));
 
         contaLabel = new Label("contaLabel", Model.of("Conta"));
-        conta = new NumberTextField("conta", new PropertyModel(banco, "conta"));
-
+        conta = new TextField("conta", new PropertyModel(banco, "conta"));
+        conta.add(new ValidatorConta("C"));
+        
         senha = new PasswordTextField("senha");
         senha.setRequired(true);
 

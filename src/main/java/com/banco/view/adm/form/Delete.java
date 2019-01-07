@@ -46,14 +46,14 @@ public class Delete extends Panel {
         } else {
             if (desOuExc) {
                 if (ativDesa) {
-                    label = "Deseja desativar a conta: " + nome;
+                    label = "Deseja desativar a conta: " + idAlvo;
                     lblLink = "Desativar";
                 } else {
-                    label = "Deseja ativar a conta: " + nome;
+                    label = "Deseja ativar a conta: " + idAlvo;
                     lblLink = "Ativar";
                 }
             } else {
-                label = "Deseja excluir a conta: " + nome;
+                label = "Deseja excluir a conta: " + idAlvo;
                 lblLink = "Excluir";
             }
         }
