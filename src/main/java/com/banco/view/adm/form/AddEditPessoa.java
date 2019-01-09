@@ -20,11 +20,14 @@ import com.banco.controller.ControllerPessoa;
 import com.banco.controller.relatorio.Relatorio;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
-import com.banco.view.adm.custom.ValidatorConta;
+import com.banco.view.adm.custom.ValidatorFieldInteger;
+import com.banco.view.adm.custom.ValidatorFieldString;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -32,7 +35,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.EmailTextField;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.NumberTextField;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -42,9 +44,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.hibernate.HibernateException;
 
 /**
  *
@@ -52,13 +54,12 @@ import org.hibernate.HibernateException;
  */
 public class AddEditPessoa extends Panel {
 
-    WebMarkupContainer bodyMarkup;
+    WebMarkupContainer bodyMarkup, contaMarkup, hrMarkup;
     Form form, formUpload;
     FeedbackPanel feedbackPanel;
 
-    TextField cpf, cep, uf, nome, cidade, bairro, endereco, agencia, conta, telefone;
+    TextField cpf, cep, uf, nome, cidade, bairro, endereco, agencia, conta, telefone, rua;
     EmailTextField email;
-    NumberTextField<Integer>  rua;
     PasswordTextField senha;
     Label btnLabel, agenciaLabel, contaLabel;
     AjaxButton submit;
@@ -70,35 +71,34 @@ public class AddEditPessoa extends Panel {
 
     List<Character> tipo = new ArrayList<>();
     JavaScriptResourceReference js = new JavaScriptResourceReference(AddEditPessoa.class, "AddEditPessoa.js");
+    CssResourceReference css = new CssResourceReference(AddEditPessoa.class, "Style.css");
 
     @Override
     public void renderHead(IHeaderResponse response) {
         response.render(JavaScriptReferenceHeaderItem.forReference(js));
+        response.render(CssReferenceHeaderItem.forReference(css));
     }
 
     public AddEditPessoa(String id, Integer idPessoa) {
 
         super(id);
 
-        gerarCampos();
-
         tipo.add('U');
         tipo.add('A');
 
-        pessoa = new Pessoa();
+        cp = new ControllerPessoa();
         banco = new BancoBrasil();
 
-        cp = new ControllerPessoa();
-
-        if (idPessoa == null) {
+        if (idPessoa == 0) {
+            pessoa = new Pessoa();
+            gerarCampos();
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
         } else {
             pessoa = cp.procurarId(idPessoa);
+            gerarCampos();
             btnLabel = new Label("btnLabel", Model.of("Editar"));
-            agenciaLabel.setVisible(false);
-            agencia.setVisible(false);
-            contaLabel.setVisible(false);
-            conta.setVisible(false);
+            contaMarkup.setVisible(false);
+            hrMarkup.setVisible(false);
             formUpload.setVisible(false);
         }
 
@@ -112,15 +112,23 @@ public class AddEditPessoa extends Panel {
                 try {
                     final FileUpload uploadedFile = fileUpload.getFileUpload();
                     if (uploadedFile != null) {
-                        if (new Relatorio().inserirPessoaExcel(uploadedFile.writeToTempFile())) {
-                            fecharModal(target);
+                        int resul = new Relatorio().inserirPessoaExcel(uploadedFile.writeToTempFile());
+                        switch (resul) {
+                            case 0:
+                                fecharModal(target);
+                                break;
+                            case 1:
+                                info("Checar os dados inseridos");
+                                target.add(feedbackPanel);
+                                break;
+                            case 2:
+                                info("Um ou mais usuarios já estão inseridos");
+                                target.add(feedbackPanel);
+                                break;
                         }
                     }
-                } catch (HibernateException ex) {
-                    info("Usuario(s) já inserido");
-                    target.add(feedbackPanel);
                 } catch (Exception ex) {
-                    info("Checar os valores inseridos no arquivo");
+                    info(ex);
                     target.add(feedbackPanel);
                 }
             }
@@ -134,7 +142,7 @@ public class AddEditPessoa extends Panel {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                
+
                 try {
                     if (idPessoa == null) {
                         banco.setPessoa(pessoa);
@@ -175,10 +183,12 @@ public class AddEditPessoa extends Panel {
         form.add(endereco);
         form.add(rua);
         form.add(bairro);
-        form.add(agenciaLabel);
-        form.add(agencia);
-        form.add(contaLabel);
-        form.add(conta);
+        contaMarkup.add(agenciaLabel);
+        contaMarkup.add(agencia);
+        contaMarkup.add(contaLabel);
+        contaMarkup.add(conta);
+        form.add(contaMarkup);
+        form.add(hrMarkup);
         form.add(new DropDownChoice("tipoConta", tipo));
         form.add(senha);
         form.add(submit);
@@ -188,13 +198,19 @@ public class AddEditPessoa extends Panel {
 
     }
 
-    public void gerarCampos() {
+    void gerarCampos() {
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
+        contaMarkup = new WebMarkupContainer("contaMarkup");
+        contaMarkup.setOutputMarkupId(true);
+
+        hrMarkup = new WebMarkupContainer("hrMarkup");
+        hrMarkup.setOutputMarkupId(true);
+
         feedbackPanel = new FeedbackPanel("feedback");
         feedbackPanel.setOutputMarkupId(true);
-        
+
         formUpload = new Form("formUpload");
         formUpload.setOutputMarkupId(true);
         formUpload.setMultiPart(true);
@@ -203,49 +219,78 @@ public class AddEditPessoa extends Panel {
 
         nome = new TextField("nome");
         nome.setRequired(true);
-        
+
         cpf = new TextField("cpf");
-        cpf.add(StringValidator.maximumLength(11));
+        cpf.add(StringValidator.exactLength(11));
         cpf.setRequired(true);
-        
+
         telefone = new TextField("telefone");
-        //telefone.add(new ValidatorConta("T"));
-        
+        telefone.add(new ValidatorFieldInteger());
+
         email = new EmailTextField("email");
         email.setRequired(true);
 
-        endereco = new TextField("endereco");
-        endereco.setRequired(true);
-        
-        rua = new NumberTextField("rua", new PropertyModel(pessoa, "numero"));
-        rua.setMinimum(1);
-        rua.setRequired(true);
-        
-        bairro = new TextField("bairro");
-        bairro.setRequired(true);
+        cep = new TextField("cep");
+        cep.add(StringValidator.exactLength(8));
+        cep.add(new ValidatorFieldString("Ce"));
+        cep.add(new AjaxFormComponentUpdatingBehavior("blur") {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                atualizarCep(target);
+            }
+
+        });
+        cep.setRequired(true);
 
         cidade = new TextField("cidade");
         cidade.setRequired(true);
-
-        cep = new TextField("cep");
-        cep.add(StringValidator.maximumLength(8));
-        cep.setRequired(true);
+        cidade.setOutputMarkupId(true);
 
         uf = new TextField("uf");
-        uf.add(StringValidator.maximumLength(2));
+        uf.add(StringValidator.exactLength(2));
         uf.setRequired(true);
+        uf.setOutputMarkupId(true);
+
+        endereco = new TextField("endereco");
+        endereco.setRequired(true);
+        endereco.setOutputMarkupId(true);
+
+        rua = new TextField("numero");
+        rua.add(new ValidatorFieldString("Ru"));
+        rua.setRequired(true);
+        rua.setOutputMarkupId(true);
+
+        bairro = new TextField("bairro");
+        bairro.setRequired(true);
+        bairro.setOutputMarkupId(true);
 
         agenciaLabel = new Label("agenciaLabel", Model.of("Agencia"));
         agencia = new TextField("agencia", new PropertyModel(banco, "agencia"));
-        agencia.add(new ValidatorConta("A"));
+        agencia.add(StringValidator.exactLength(5));
+        agencia.add(new ValidatorFieldString("Ag"));
 
         contaLabel = new Label("contaLabel", Model.of("Conta"));
         conta = new TextField("conta", new PropertyModel(banco, "conta"));
-        conta.add(new ValidatorConta("C"));
-        
+        conta.add(StringValidator.exactLength(6));
+        conta.add(new ValidatorFieldString("Co"));
+
         senha = new PasswordTextField("senha");
         senha.setRequired(true);
 
+    }
+
+    void atualizarCep(AjaxRequestTarget target) {
+        pessoa.setCidade("abc");
+        pessoa.setUf("ab");
+        pessoa.setEndereco("abc");
+        pessoa.setNumero(5);
+        pessoa.setBairro("abc");
+        target.add(cidade);
+        target.add(uf);
+        target.add(endereco);
+        target.add(rua);
+        target.add(bairro);
     }
 
     public void fecharModal(AjaxRequestTarget target) {

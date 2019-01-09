@@ -19,19 +19,20 @@ import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
+import com.banco.view.adm.custom.ValidatorFieldString;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.NumberTextField;
+import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.validator.StringValidator;
 
 /**
  *
@@ -41,7 +42,9 @@ public class AddEditConta extends Panel {
 
     WebMarkupContainer bodyMarkup;
     Form form;
+    FeedbackPanel feedbackPanel;
     AjaxButton submit;
+    TextField agencia, conta;
 
     Pessoa pessoa;
     BancoBrasil banco;
@@ -55,21 +58,40 @@ public class AddEditConta extends Panel {
 
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
 
+        feedbackPanel = new FeedbackPanel("feedback");
+        feedbackPanel.setOutputMarkupId(true);
+
         form = new Form("form", new CompoundPropertyModel<>(banco));
-                
+
+        agencia = new TextField("agencia");
+        agencia.setRequired(true);
+        agencia.add(StringValidator.exactLength(5));
+        agencia.add(new ValidatorFieldString("A"));
+
+        conta = new TextField("conta");
+        conta.setRequired(true);
+        conta.add(StringValidator.exactLength(6));
+        conta.add(new ValidatorFieldString("C"));
+
         submit = new AjaxButton("submit", form) {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                pessoa = new ControllerPessoa().procurar(pessoa.getCpf()).get(0);
-                banco.setEstadoConta(true);
-                banco.setPessoa(pessoa);
-                new ControllerBanco().adicionarOuEditar(banco);
-                fecharModal(target);
+                try {
+                    pessoa = new ControllerPessoa().procurar(pessoa.getCpf()).get(0);
+                    banco.setEstadoConta(true);
+                    banco.setPessoa(pessoa);
+                    new ControllerBanco().adicionarOuEditar(banco);
+                    fecharModal(target);
+                } catch (Exception e) {
+                    info("Conta já existente");
+                    target.add(feedbackPanel);
+                }
             }
 
             @Override
             protected void onError(AjaxRequestTarget target) {
+                target.add(feedbackPanel);
             }
 
         };
@@ -79,15 +101,15 @@ public class AddEditConta extends Panel {
             protected List<String> load() {
                 List<String> list = new ControllerPessoa().listarCpf();
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).length() < 10) {
+                    if (list.get(i).length() != 11) {
                         list.remove(i);
                     }
                 }
                 return list;
             }
         }));
-        form.add(new NumberTextField("agencia"));
-        form.add(new NumberTextField("conta"));
+        form.add(agencia);
+        form.add(conta);
         form.add(submit);
 
         bodyMarkup.add(form);

@@ -35,8 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -48,6 +46,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -55,20 +55,51 @@ import org.apache.poi.ss.usermodel.Row;
  */
 public class Relatorio implements Serializable {
 
-    public boolean inserirPessoaExcel(File file) {
+    private boolean validarExcel(Pessoa pessoa) {
+
+        final String emailValidator = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", integerValidator = "[0-9]+", stringValidator = "[A-Za-z]+";
+
+        final String nome = pessoa.getNome(), cpf = pessoa.getCpf(), email = pessoa.getEmail(), telefone = Integer.toString(pessoa.getTelefone());
+        final String cep = pessoa.getCep(), endereco = pessoa.getEndereco(), cidade = pessoa.getCidade(), bairro = pessoa.getBairro();
+        final String rua = Integer.toString(pessoa.getNumero()), uf = pessoa.getUf(), tipo = Character.toString(pessoa.getTipoConta()), senha = pessoa.getSenha();
+
+        try {
+            if (nome.isEmpty() || cpf.isEmpty() || email.isEmpty() || telefone.isEmpty() || cep.isEmpty() || endereco.isEmpty() || 
+                    cidade.isEmpty() || bairro.isEmpty() || rua.isEmpty() || uf.isEmpty() || tipo.isEmpty() || senha.isEmpty()) {
+                return false;
+            }
+            if (!nome.matches(stringValidator) || !cidade.matches(stringValidator) || !bairro.matches(stringValidator)) {
+                return false;
+            }
+            if (cpf.length() != 11 || !cpf.matches(integerValidator) || cep.length() != 8 || !cep.matches(integerValidator)) {
+                return false;
+            }
+            if (!email.matches(emailValidator) || uf.length() != 2) {
+                return false;
+            }
+            if (telefone.length() != 9 || !telefone.matches(integerValidator)) {
+                return false;
+            }
+            return (tipo.equals("A") || tipo.equals("U"));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public int inserirPessoaExcel(File file) {
 
         List<Pessoa> pessoas = new ArrayList();
 
         try {
 
-            HSSFWorkbook workBook = new HSSFWorkbook(new FileInputStream(file));
-            HSSFSheet sheet = workBook.getSheetAt(0);
+            XSSFWorkbook workBook = new XSSFWorkbook(new FileInputStream(file));
+            XSSFSheet sheet = workBook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
 
             int linha = 0;
             while (rowIterator.hasNext()) {
                 int dados = 1;
-                Row row = rowIterator.next(); // For each row, iterate through each columns 
+                Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
                 if (linha > 0) {
                     Pessoa pessoa = new Pessoa();
@@ -117,20 +148,25 @@ public class Relatorio implements Serializable {
                         }
                         dados++;
                     }
+                    if (validarExcel(pessoa) == false) {
+                        return 1;
+                    }
                     pessoas.add(pessoa);
                 }
                 linha++;
             }
-            
+
             for (Pessoa p : pessoas) {
-                new ControllerPessoa().adicionarOuEditar(p);
+                if (new ControllerPessoa().adicionar(p) == 2) {
+                    return 2;
+                }
             }
-            
-            return true;
-            
+
+            return 0;
+
         } catch (IOException ex) {
-            return false;
-        } 
+            return 3;
+        }
     }
 
     public byte[] gerarExcelPessoa(Integer id) {

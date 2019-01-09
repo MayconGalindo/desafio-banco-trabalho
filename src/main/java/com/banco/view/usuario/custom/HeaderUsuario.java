@@ -36,8 +36,7 @@ import org.apache.wicket.Session;
  */
 public final class HeaderUsuario extends Panel {
 
-    ModalWindow listaC;
-    ModalWindow listaT;
+    ModalWindow listaC, listaT;
     WebMarkupContainer bodyMarkup;
     IRequestablePage page;
 
@@ -58,7 +57,6 @@ public final class HeaderUsuario extends Panel {
         });
 
         listaC = new ModalWindow("listaC");
-        listaC.setTitle("Minhas Contas");
         listaC.setContent(new ListarConta(listaC.getContentId(), pessoa, null, "", true));
         bodyMarkup.add(listaC);
 

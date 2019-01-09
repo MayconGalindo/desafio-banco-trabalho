@@ -15,7 +15,6 @@
  */
 package com.banco.view.usuario;
 
-import com.banco.TelaLogin;
 import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.BancoBrasil;
@@ -26,9 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -43,7 +39,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.util.string.Strings;
 
 /**
@@ -57,16 +52,11 @@ public final class Acao extends Panel {
     Form form;
     ModalWindow aviso;
 
-    Label lblTed;
-    Label lblBanco;
-    Label lblAgencia;
-    Label lblConta;
+    Label lblTed, lblBanco, lblAgencia, lblConta;
 
-    NumberTextField banco;
+    NumberTextField banco, inp;
     AjaxCheckBox checkBoxTed;
-    AutoCompleteTextField<Integer> agencia;
-    AutoCompleteTextField<Integer> contaTransf;
-    NumberTextField inp;
+    AutoCompleteTextField<Integer> agencia, contaTransf;
     AjaxButton submit;
 
     List<Contato> contatos;

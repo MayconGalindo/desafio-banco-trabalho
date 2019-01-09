@@ -57,6 +57,21 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
     }
 
+    public int adicionar(Pessoa pessoa) {
+
+        try {
+            session.beginTransaction();
+            session.save(pessoa);
+            session.getTransaction().commit();
+            return 0;
+        } catch (HibernateException e) {
+            return 2;
+        } finally {
+            closeSession();
+        }
+
+    }
+    
     @Override
     public void excluir(int id) {
 
@@ -66,7 +81,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             session.delete(pessoa);
             session.getTransaction().commit();
         } catch (HibernateException e) {
-            System.out.println(e);
         } finally {
             closeSession();
         }
@@ -80,7 +94,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             session.beginTransaction();
             return session.createCriteria(Pessoa.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -99,7 +112,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             }
             return cpf;
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -131,7 +143,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
             return lista;
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -151,7 +162,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             }
             return list;
         } catch (NullPointerException | HibernateException e) {
-            System.out.println(e);
             return session.createCriteria(Pessoa.class).list();
         } finally {
             closeSession();
@@ -166,7 +176,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             pessoa = (Pessoa) session.get(Pessoa.class, id);
             return pessoa;
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -182,7 +191,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             list = session.createCriteria(Pessoa.class).add(Restrictions.eq("cidade", filtros)).list();
             return list;
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -197,7 +205,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("cpf", cpf)).add(Restrictions.eq("senha", senha)).uniqueResult();
             return senha.equals(pessoa.getSenha());
         } catch (NullPointerException | HibernateException e) {
-            System.out.println(e);
             return false;
         } finally {
             closeSession();
@@ -212,7 +219,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             pessoa = (Pessoa) session.createCriteria(Pessoa.class).add(Restrictions.eq("cpf", cpf)).add(Restrictions.eq("senha", senha)).uniqueResult();
             return pessoa;
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -250,7 +256,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
                 return criteria.add(Restrictions.or(crit1, crit2)).list();
             }
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -278,7 +283,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
             transf = criteria.list();
             return transf;
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();
@@ -315,7 +319,6 @@ public abstract class ControllerPessoaImpl extends SessionGenerator implements C
 
             return criteria.list();
         } catch (HibernateException e) {
-            System.out.println(e);
             return null;
         } finally {
             closeSession();

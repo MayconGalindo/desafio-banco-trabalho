@@ -39,11 +39,9 @@ import org.apache.wicket.util.resource.AbstractResourceStreamWriter;
  */
 public class FuncoesAdm extends Panel {
 
-    ModalWindow modalDel;
-    ModalWindow modalEdit;
+    ModalWindow modalDel, modalEdit;
     private final WebMarkupContainer bodyMarkup;
-    CssResourceReference cssCor = new CssResourceReference(FuncoesAdm.class, "Funcoes.css");
-    CssResourceReference cssGlyp = new CssResourceReference(FuncoesAdm.class, "bootstrap.css");
+    CssResourceReference cssCor = new CssResourceReference(FuncoesAdm.class, "Funcoes.css"), cssGlyp = new CssResourceReference(FuncoesAdm.class, "bootstrap.css");
 
     @Override
     public void renderHead(IHeaderResponse response) {
@@ -60,8 +58,9 @@ public class FuncoesAdm extends Panel {
 
         modalDel = new ModalWindow("modalDel");
         modalDel.setOutputMarkupId(true);
+        modalDel.setInitialHeight(115);
+        modalDel.setInitialWidth(300);
         modalDel.setResizable(false);
-        modalDel.setTitle("Excluir");
         modalDel.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, false, atvOuDtv, nome) {
 
             @Override
@@ -83,8 +82,6 @@ public class FuncoesAdm extends Panel {
 
         modalEdit = new ModalWindow("modalEdit");
         modalEdit.setOutputMarkupId(true);
-        modalEdit.setResizable(false);
-        modalEdit.setTitle("Editar");
         if (pessoaOuBanco) {
 
             modalEdit.setContent(new AddEditPessoa(modalEdit.getContentId(), idPessoa) {

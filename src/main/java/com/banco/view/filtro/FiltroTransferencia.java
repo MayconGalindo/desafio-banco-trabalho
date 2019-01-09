@@ -40,8 +40,7 @@ public class FiltroTransferencia extends Panel {
     
     private final WebMarkupContainer bodyMarkup;
     Form form;
-    LoadableDetachableModel listaCpfR;
-    LoadableDetachableModel listaCpfD;
+    LoadableDetachableModel listaCpfR, listaCpfD;
     
     private Transferencia transferencia;
     List<Double> valor = new ArrayList<>();

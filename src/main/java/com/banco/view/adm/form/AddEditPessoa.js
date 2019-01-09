@@ -36,6 +36,7 @@ $(document).ready(function () {
             $('#uf').val(data.uf);
             $('#endereco').val(data.logradouro);
             $('#bairro').val(data.bairro);
+            
         });
     });
 });

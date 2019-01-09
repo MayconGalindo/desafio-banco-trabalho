@@ -15,8 +15,6 @@
  */
 package com.banco.view.adm;
 
-import com.banco.TelaLogin;
-import com.banco.controller.ControllerBanco;
 import com.banco.controller.ControllerPessoa;
 import com.banco.model.Pessoa;
 import com.banco.view.adm.custom.AdmHeader;
@@ -42,15 +40,6 @@ public final class InicioAdm extends WebPage {
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
     List<Pessoa> refreshLista = new ControllerPessoa().listar();
-
-    @Override
-    protected void onConfigure() {
-        super.onConfigure();
-        if (getSession().isSessionInvalidated()) {
-            setResponsePage(TelaLogin.class);
-        }
-        
-    }
     
     public InicioAdm() throws ParseException{
 
@@ -90,6 +79,10 @@ public final class InicioAdm extends WebPage {
             protected void populateItem(ListItem<Pessoa> item) {
 
                 Pessoa pessoa = item.getModelObject();
+                
+                String tipo;
+                if (pessoa.getTipoConta() == 'A') tipo = "Adm";
+                else tipo = "Usuario";
 
                 item.add(new Label("id", pessoa.getId()));
                 item.add(new Label("nome", pessoa.getNome()));
@@ -97,8 +90,7 @@ public final class InicioAdm extends WebPage {
                 item.add(new Label("cep", pessoa.getCep()));
                 item.add(new Label("endereco", pessoa.getEndereco() + ", " + pessoa.getNumero()));
                 item.add(new Label("email", pessoa.getEmail()));
-                item.add(new Label("tipoConta", pessoa.getTipoConta()));
-                item.add(new Label("contas", new ControllerBanco().contasPessoa(pessoa.getId()).size()));
+                item.add(new Label("tipoConta", tipo));
                 item.add(new FuncoesAdm("funcoes", pessoa.getId(), true, true, pessoa.getNome()) {
 
                     @Override

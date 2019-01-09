@@ -61,14 +61,14 @@ public class AdmHeader extends Panel {
     Component add;
     CompoundPropertyModel model;
     PropertyModel txtSearch;
-    AjaxLink btnAdd; 
+    AjaxLink btnAdd;
 
     Pessoa pessoa;
     BancoBrasil banco;
     String titulo;
     List searchList;
-	
-	CssResourceReference css = new CssResourceReference(AdmHeader.class, "Style.css");
+
+    CssResourceReference css = new CssResourceReference(AdmHeader.class, "Style.css");
 
     @Override
     public void renderHead(IHeaderResponse response) {
@@ -86,12 +86,10 @@ public class AdmHeader extends Panel {
 
         formAdd = new ModalWindow("formAdd");
         formAdd.setOutputMarkupId(true);
-        formAdd.setInitialHeight(600);
-        formAdd.setInitialWidth(1200);
 
         if (pagina) {
             titulo = "Adicionar Pessoa";
-            add = new AddEditPessoa(formAdd.getContentId(), null) {
+            add = new AddEditPessoa(formAdd.getContentId(), 0) {
 
                 @Override
                 public void fecharModal(AjaxRequestTarget target) {
@@ -103,7 +101,7 @@ public class AdmHeader extends Panel {
             txtSearch = new PropertyModel<>(pessoa, "cpf");
         } else {
             titulo = "Adicionar Conta";
-            add = new AddEditConta(formAdd.getContentId()){
+            add = new AddEditConta(formAdd.getContentId()) {
 
                 @Override
                 public void fecharModal(AjaxRequestTarget target) {
@@ -161,7 +159,7 @@ public class AdmHeader extends Panel {
 
         bodyMarkup.add(new AjaxLink("usuario") {
 
-            @Override 
+            @Override
             public void onClick(AjaxRequestTarget target) {
                 try {
                     page = new InicioAdm();
@@ -216,11 +214,11 @@ public class AdmHeader extends Panel {
 
         add(bodyMarkup);
 
-        if (remover){
+        if (remover) {
             formAdd.setVisible(false);
             btnAdd.setVisible(false);
             searchForm.setVisible(false);
-        } 
+        }
 
     }
 
