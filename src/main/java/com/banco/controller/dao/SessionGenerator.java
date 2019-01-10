@@ -30,22 +30,30 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
  */
 public abstract class SessionGenerator {
 
-    private final Class cls1 = BancoBrasil.class,
+    private static final Class cls1 = BancoBrasil.class,
             cls2 = Pessoa.class,
             cls3 = Transferencia.class,
             cls4 = Contato.class;
-    String caminho = "hibernate.cfg.xml";
+    static final String caminho = "hibernate.cfg.xml";
 
-    Configuration config = new Configuration()
+    static final Configuration config;
+    static final Properties configProperties;
+    static final StandardServiceRegistryBuilder serviceRegisteryBuilder;
+    static final ServiceRegistry serviceRegistry;
+    static SessionFactory factory;
+    
+    static {
+        config = new Configuration()
             .addAnnotatedClass(cls1)
             .addAnnotatedClass(cls2)
             .addAnnotatedClass(cls3)
             .addAnnotatedClass(cls4)
             .configure(caminho);
-    Properties configProperties = config.getProperties();
-    StandardServiceRegistryBuilder serviceRegisteryBuilder = new StandardServiceRegistryBuilder();
-    ServiceRegistry serviceRegistry = serviceRegisteryBuilder.applySettings(configProperties).build();
-    SessionFactory factory = config.buildSessionFactory(serviceRegistry);
+        configProperties = config.getProperties();
+        serviceRegisteryBuilder = new StandardServiceRegistryBuilder();
+        serviceRegistry = serviceRegisteryBuilder.applySettings(configProperties).build();
+        factory = config.buildSessionFactory(serviceRegistry);
+    }
    
     public Session getSession() {
         return factory.getCurrentSession();

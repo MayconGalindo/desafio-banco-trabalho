@@ -39,12 +39,14 @@ public final class InicioAdm extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
-    List<Pessoa> refreshLista = new ControllerPessoa().listar();
+    List<Pessoa> refreshLista;
     
     public InicioAdm() throws ParseException{
 
         super();
 
+        refreshLista = new ControllerPessoa().listar();
+        
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);
 

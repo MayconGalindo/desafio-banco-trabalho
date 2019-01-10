@@ -68,7 +68,6 @@ public class AddEditPessoa extends Panel {
     AjaxButton submit;
     private FileUploadField fileUpload;
 
-    ControllerPessoa cp;
     Pessoa pessoa;
     BancoBrasil banco;
 
@@ -89,7 +88,6 @@ public class AddEditPessoa extends Panel {
         tipo.add('U');
         tipo.add('A');
 
-        cp = new ControllerPessoa();
         banco = new BancoBrasil();
 
         if (idPessoa == 0) {
@@ -97,7 +95,7 @@ public class AddEditPessoa extends Panel {
             gerarCampos();
             btnLabel = new Label("btnLabel", Model.of("Adicionar"));
         } else {
-            pessoa = cp.procurarId(idPessoa);
+            pessoa = new ControllerPessoa().procurarId(idPessoa);
             gerarCampos();
             btnLabel = new Label("btnLabel", Model.of("Editar"));
             contaMarkup.setVisible(false);

@@ -39,11 +39,13 @@ public class ContaAdm extends WebPage {
 
     WebMarkupContainer bodyMarkup;
     PageableListView listView;
-    List<BancoBrasil> refreshLista = new ControllerBanco().listar();
+    List<BancoBrasil> refreshLista;
 
     public ContaAdm() throws ParseException{
 
         super();
+        
+        refreshLista = new ControllerBanco().listar();
         
         bodyMarkup = new WebMarkupContainer("bodyMarkup");
         bodyMarkup.setOutputMarkupId(true);

@@ -19,7 +19,6 @@ import com.banco.model.BancoBrasil;
 import com.banco.model.Contato;
 import com.banco.model.Pessoa;
 import com.banco.model.Transferencia;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
 import org.hibernate.HibernateException;
@@ -31,7 +30,7 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author NOTEDESENVSP1
  */
-public abstract class ControllerBancoImpl extends SessionGenerator implements ControllerDAO<BancoBrasil>, Serializable {
+public abstract class ControllerBancoImpl extends SessionGenerator implements ControllerDAO<BancoBrasil> {
 
     Transferencia transferencia;
     Session session = getSession();

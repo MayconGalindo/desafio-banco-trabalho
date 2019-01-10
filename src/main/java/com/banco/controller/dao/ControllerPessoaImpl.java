@@ -18,7 +18,6 @@ package com.banco.controller.dao;
 import com.banco.model.Contato;
 import com.banco.model.Pessoa;
 import com.banco.model.Transferencia;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.Criteria;
@@ -33,7 +32,7 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author NOTEDESENVSP1
  */
-public abstract class ControllerPessoaImpl extends SessionGenerator implements ControllerDAO<Pessoa>, Serializable {
+public abstract class ControllerPessoaImpl extends SessionGenerator implements ControllerDAO<Pessoa> {
 
     List<Pessoa> list;
     List<Transferencia> transf;
