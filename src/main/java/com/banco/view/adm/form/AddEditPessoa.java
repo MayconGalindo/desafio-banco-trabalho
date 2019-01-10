@@ -22,6 +22,9 @@ import com.banco.model.BancoBrasil;
 import com.banco.model.Pessoa;
 import com.banco.view.adm.custom.ValidatorFieldInteger;
 import com.banco.view.adm.custom.ValidatorFieldString;
+import com.github.gilbertotorrezan.viacep.se.ViaCEPClient;
+import com.github.gilbertotorrezan.viacep.shared.ViaCEPEndereco;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -54,7 +57,7 @@ import org.apache.wicket.validation.validator.StringValidator;
  */
 public class AddEditPessoa extends Panel {
 
-    WebMarkupContainer bodyMarkup, contaMarkup, hrMarkup;
+    WebMarkupContainer bodyMarkup, contaMarkup, hrMarkupConta, hrMarkupFeedback;
     Form form, formUpload;
     FeedbackPanel feedbackPanel;
 
@@ -98,7 +101,8 @@ public class AddEditPessoa extends Panel {
             gerarCampos();
             btnLabel = new Label("btnLabel", Model.of("Editar"));
             contaMarkup.setVisible(false);
-            hrMarkup.setVisible(false);
+            hrMarkupConta.setVisible(false);
+            hrMarkupFeedback.setVisible(false);
             formUpload.setVisible(false);
         }
 
@@ -188,7 +192,7 @@ public class AddEditPessoa extends Panel {
         contaMarkup.add(contaLabel);
         contaMarkup.add(conta);
         form.add(contaMarkup);
-        form.add(hrMarkup);
+        form.add(hrMarkupConta);
         form.add(new DropDownChoice("tipoConta", tipo));
         form.add(senha);
         form.add(submit);
@@ -205,8 +209,12 @@ public class AddEditPessoa extends Panel {
         contaMarkup = new WebMarkupContainer("contaMarkup");
         contaMarkup.setOutputMarkupId(true);
 
-        hrMarkup = new WebMarkupContainer("hrMarkup");
-        hrMarkup.setOutputMarkupId(true);
+        hrMarkupConta = new WebMarkupContainer("hrMarkupConta");
+        hrMarkupConta.setOutputMarkupId(true);
+        
+        hrMarkupFeedback = new WebMarkupContainer("hrMarkupFeedback");
+        hrMarkupFeedback.setOutputMarkupId(true);
+        bodyMarkup.add(hrMarkupFeedback);
 
         feedbackPanel = new FeedbackPanel("feedback");
         feedbackPanel.setOutputMarkupId(true);
@@ -237,7 +245,26 @@ public class AddEditPessoa extends Panel {
 
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
-                atualizarCep(target);
+                try {
+                    target.add(cep);
+                    ViaCEPEndereco viaCep = new ViaCEPClient().getEndereco(pessoa.getCep());
+                    pessoa.setCidade(viaCep.getLocalidade());
+                    pessoa.setUf(viaCep.getUf());
+                    pessoa.setEndereco(viaCep.getLogradouro());
+                    pessoa.setBairro(viaCep.getBairro());
+                } catch (NullPointerException | IOException e) {
+                    info("Cep não encontrado");
+                    pessoa.setCidade("");
+                    pessoa.setUf("");
+                    pessoa.setEndereco("");
+                    pessoa.setBairro("");
+                } finally {
+                    target.add(cidade);
+                    target.add(uf);
+                    target.add(endereco);
+                    target.add(bairro);
+                    target.add(feedbackPanel);
+                }
             }
 
         });
@@ -278,19 +305,6 @@ public class AddEditPessoa extends Panel {
         senha = new PasswordTextField("senha");
         senha.setRequired(true);
 
-    }
-
-    void atualizarCep(AjaxRequestTarget target) {
-        pessoa.setCidade("abc");
-        pessoa.setUf("ab");
-        pessoa.setEndereco("abc");
-        pessoa.setNumero(5);
-        pessoa.setBairro("abc");
-        target.add(cidade);
-        target.add(uf);
-        target.add(endereco);
-        target.add(rua);
-        target.add(bairro);
     }
 
     public void fecharModal(AjaxRequestTarget target) {

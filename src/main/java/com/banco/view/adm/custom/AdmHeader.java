@@ -35,6 +35,7 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -60,12 +61,13 @@ public class AdmHeader extends Panel {
     ModalWindow formAdd;
     Component add;
     CompoundPropertyModel model;
-    PropertyModel txtSearch;
+    PropertyModel modelSearch;
     AjaxLink btnAdd;
+    SearchTextField txtSearch;
 
     Pessoa pessoa;
     BancoBrasil banco;
-    String titulo;
+    String titulo, placeHolder;
     List searchList;
 
     CssResourceReference css = new CssResourceReference(AdmHeader.class, "Style.css");
@@ -88,6 +90,10 @@ public class AdmHeader extends Panel {
         formAdd.setOutputMarkupId(true);
 
         if (pagina) {
+            formAdd.setMinimalHeight(500);
+            formAdd.setMinimalWidth(1200);
+            formAdd.setInitialHeight(500);
+            formAdd.setInitialWidth(1200);
             titulo = "Adicionar Pessoa";
             add = new AddEditPessoa(formAdd.getContentId(), 0) {
 
@@ -98,8 +104,14 @@ public class AdmHeader extends Panel {
                 }
 
             };
-            txtSearch = new PropertyModel<>(pessoa, "cpf");
+            modelSearch = new PropertyModel<>(pessoa, "cpf");
+            placeHolder = "Procurar por Cpf";
+            txtSearch = new SearchTextField<String>("txtSearch", modelSearch, placeHolder);
         } else {
+            formAdd.setMinimalHeight(500);
+            formAdd.setMinimalWidth(500);
+            formAdd.setInitialHeight(500);
+            formAdd.setInitialWidth(500);
             titulo = "Adicionar Conta";
             add = new AddEditConta(formAdd.getContentId()) {
 
@@ -110,7 +122,9 @@ public class AdmHeader extends Panel {
                 }
 
             };
-            txtSearch = new PropertyModel<>(banco, "conta");
+            modelSearch = new PropertyModel<>(banco, "conta");
+            placeHolder = "Procurar por conta";
+            txtSearch = new SearchTextField<Integer>("txtSearch", modelSearch, placeHolder);
         }
 
         formAdd.setTitle(titulo);
@@ -132,7 +146,7 @@ public class AdmHeader extends Panel {
 
         searchForm = new Form<>("searchForm");
 
-        searchForm.add(new TextField<>("txtSearch", txtSearch));
+        searchForm.add(txtSearch);
         searchForm.add(new AjaxButton("btnSearch", searchForm) {
 
             @Override
@@ -143,9 +157,7 @@ public class AdmHeader extends Panel {
                 } else {
                     searchList = new ControllerBanco().procurar(banco.getConta());
                 }
-
                 procurarLista(target, searchList);
-
             }
 
             @Override

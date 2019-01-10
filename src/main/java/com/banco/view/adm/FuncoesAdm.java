@@ -48,7 +48,7 @@ public class FuncoesAdm extends Panel {
         response.render(CssReferenceHeaderItem.forReference(cssCor));
         response.render(CssReferenceHeaderItem.forReference(cssGlyp));
     }
-    
+
     public FuncoesAdm(String id, Integer idPessoa, boolean pessoaOuBanco, boolean atvOuDtv, String nome) {
 
         super(id);
@@ -83,7 +83,11 @@ public class FuncoesAdm extends Panel {
         modalEdit = new ModalWindow("modalEdit");
         modalEdit.setOutputMarkupId(true);
         if (pessoaOuBanco) {
-
+            
+            modalEdit.setMinimalHeight(500);
+            modalEdit.setMinimalWidth(1200);
+            modalEdit.setInitialHeight(500);
+            modalEdit.setInitialWidth(1200);
             modalEdit.setContent(new AddEditPessoa(modalEdit.getContentId(), idPessoa) {
 
                 @Override
@@ -95,7 +99,10 @@ public class FuncoesAdm extends Panel {
             });
 
         } else {
-
+            
+            modalEdit.setInitialHeight(115);
+            modalEdit.setInitialWidth(300);
+            modalEdit.setResizable(false);
             modalEdit.setContent(new Delete(modalDel.getContentId(), idPessoa, pessoaOuBanco, true, atvOuDtv, nome) {
 
                 @Override

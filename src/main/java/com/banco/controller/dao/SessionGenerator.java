@@ -16,9 +16,12 @@
 package com.banco.controller.dao;
 
 import com.banco.model.*;
+import java.util.Properties;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 /**
@@ -26,21 +29,24 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
  * @author NOTEDESENVSP1
  */
 public abstract class SessionGenerator {
-    
-    private final Class cls1 = BancoBrasil.class, 
-            cls2 = Pessoa.class, 
-            cls3 = Transferencia.class, 
+
+    private final Class cls1 = BancoBrasil.class,
+            cls2 = Pessoa.class,
+            cls3 = Transferencia.class,
             cls4 = Contato.class;
     String caminho = "hibernate.cfg.xml";
-    
+
     Configuration config = new Configuration()
-            .configure(caminho)
             .addAnnotatedClass(cls1)
             .addAnnotatedClass(cls2)
             .addAnnotatedClass(cls3)
-            .addAnnotatedClass(cls4);
-    SessionFactory factory = config.buildSessionFactory();
-
+            .addAnnotatedClass(cls4)
+            .configure(caminho);
+    Properties configProperties = config.getProperties();
+    StandardServiceRegistryBuilder serviceRegisteryBuilder = new StandardServiceRegistryBuilder();
+    ServiceRegistry serviceRegistry = serviceRegisteryBuilder.applySettings(configProperties).build();
+    SessionFactory factory = config.buildSessionFactory(serviceRegistry);
+   
     public Session getSession() {
         return factory.getCurrentSession();
     }
@@ -49,9 +55,9 @@ public abstract class SessionGenerator {
         factory.close();
     }
 
-    public void criarTabela(){
+    public void criarTabela() {
         new SchemaExport(config).create(true, true);
         factory.close();
     }
-    
+
 }

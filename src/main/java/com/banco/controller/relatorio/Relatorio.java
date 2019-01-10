@@ -68,13 +68,13 @@ public class Relatorio implements Serializable {
                     cidade.isEmpty() || bairro.isEmpty() || rua.isEmpty() || uf.isEmpty() || tipo.isEmpty() || senha.isEmpty()) {
                 return false;
             }
-            if (!nome.matches(stringValidator) || !cidade.matches(stringValidator) || !bairro.matches(stringValidator)) {
+            if (!nome.matches(stringValidator) || !cidade.matches(stringValidator) || !bairro.matches(stringValidator) || !uf.matches(stringValidator)) {
                 return false;
             }
             if (cpf.length() != 11 || !cpf.matches(integerValidator) || cep.length() != 8 || !cep.matches(integerValidator)) {
                 return false;
             }
-            if (!email.matches(emailValidator) || uf.length() != 2) {
+            if (!email.matches(emailValidator) || uf.length() != 2 || !rua.matches(integerValidator)) {
                 return false;
             }
             if (telefone.length() != 9 || !telefone.matches(integerValidator)) {

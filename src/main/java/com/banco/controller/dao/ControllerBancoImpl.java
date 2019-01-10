@@ -49,7 +49,6 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             session.getTransaction().commit();
             return true;
         } catch (HibernateException e) {
-            System.out.println(e);
             return false;
         } finally {
             closeSession();
@@ -121,7 +120,6 @@ public abstract class ControllerBancoImpl extends SessionGenerator implements Co
             }
             return list;
         } catch (NullPointerException | HibernateException e) {
-            System.out.println(e);
             return session.createCriteria(BancoBrasil.class).list();
         } finally {
             closeSession();
